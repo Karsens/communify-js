@@ -1,0 +1,10 @@
+database/*
+node_modules
+dist/*
+uploads/*
+.env
+.DS_Store
+uploads/**
+uploads
+server.cert
+server.key
