@@ -1,18 +1,23 @@
-const changePassword = async (req, res, User) => {
-  const { token, password } = req.body;
+const md5 = require("md5");
 
-  if (token) {
-    const user = await User.update(
-      { password },
-      { where: { loginToken: token } }
-    );
-    if (user[0] === 1) {
-      res.json({ success: "Wachtwoord veranderd" });
-    } else {
-      res.json({ error: "No correct token" });
-    }
+const changePassword = async (req, res, User) => {
+  const { token, password, passwordOld } = req.body;
+
+  console.log("we get here");
+  if (!token || !password || !passwordOld) {
+    res.json({ response: "Fill in all fields, please" });
+    return;
+  }
+
+  const user = await User.update(
+    { password: md5(password) },
+    { where: { loginToken: token, password: md5(passwordOld) } }
+  );
+
+  if (user[0] === 1) {
+    res.json({ response: "Password changed" });
   } else {
-    res.json({ error: "No correct token" });
+    res.json({ response: "Incorrect password" });
   }
 };
 

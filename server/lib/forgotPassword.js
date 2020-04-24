@@ -1,7 +1,9 @@
 const forgotPassword = async (req, res, User) => {
-  const { email } = req.body;
+  const { email, fid } = req.body;
 
-  const user = await User.findOne({ where: { email } });
+  const user = await User.findOne({ where: { email, fid } });
+
+  const EMAIL_FROM = "info@communify.cc";
 
   if (user) {
     const forgotPasswordToken = Math.round(Math.random() * 999999999);
@@ -9,16 +11,18 @@ const forgotPassword = async (req, res, User) => {
     const msg = {
       to: email,
       from: EMAIL_FROM,
-      subject: "Wachtwoord resetten mastercrimez.nl",
-      text: `Klik op de link om je wachtwoord te resetten: https://mastercrimez.nl/#/RecoverPassword/${forgotPasswordToken}`,
+      subject: "Reset password communify.cc",
+      text: `Click the link to reset your password: https://communify.cc/recoverPassword/${forgotPasswordToken}`,
     };
+
+    User.update({ forgotPasswordToken }, { where: { id: user.id } });
 
     //ES6
     sgMail.send(msg).then(() => {
-      res.json({ success: "Check je mail om je wachtwoord te resetten" });
+      res.json({ response: "Check je mail om je wachtwoord te resetten" });
     }, console.error);
   } else {
-    res.json({ error: "Email niet gevonden" });
+    res.json({ response: "Email not found" });
   }
 };
 

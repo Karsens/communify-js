@@ -1,5 +1,5 @@
 const update = async (req, res, User) => {
-  const { loginToken, image, bio } = req.body;
+  const { loginToken, name, image, bio } = req.body;
 
   if (!loginToken) {
     res.json({ response: "Geen token" });
@@ -19,14 +19,16 @@ const update = async (req, res, User) => {
     update.image = image;
   }
 
+  if (name) {
+    update.name = name;
+  }
+
   if (bio) {
     update.bio = bio;
   }
 
-  if (loginToken) {
-    const user = await User.update(update, { where: { loginToken } });
-    res.json({ user });
-  }
+  await User.update(update, { where: { loginToken } });
+  res.json({ response: "Profile updated" });
 };
 
 module.exports = { update };

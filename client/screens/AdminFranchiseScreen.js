@@ -19,7 +19,7 @@ class AdminFranchiseScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Admin" });
+    props.navigation.setOptions({ headerTitle: "Franchises" });
 
     this.state = {
       franchises: [],

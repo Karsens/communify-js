@@ -7,20 +7,22 @@ import Button from "../components/Button";
 import { withGlobalContext } from "../GlobalContext";
 import STYLE from "../Style";
 import Constants from "../Constants";
-class LoginScreen extends React.Component {
-  state = {
-    password: "",
-    email: "",
-  };
+class UpdateProfileScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Login" });
+    props.navigation.setOptions({ headerTitle: "Update profile" });
+
+    this.state = {
+      name: props.global.me?.name,
+      bio: props.global.me?.bio,
+      image: props.global.me?.image,
+    };
   }
 
   render() {
     const { navigation, global } = this.props;
-    const { email, password, response } = this.state;
+    const { image, name, bio, response } = this.state;
 
     return (
       <View style={styles.container}>
@@ -36,59 +38,46 @@ class LoginScreen extends React.Component {
           </View>
           <TextInput
             style={STYLE.textInput}
-            value={email}
-            placeholder="Email"
-            onChangeText={(email) => this.setState({ email })}
+            value={name}
+            placeholder="Name"
+            onChangeText={(name) => this.setState({ name })}
           />
 
           <TextInput
-            style={STYLE.textInput}
-            value={password}
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={(password) => this.setState({ password })}
+            style={[STYLE.textInput, { height: 200 }]}
+            numberOfLines={4}
+            multiline
+            value={bio}
+            placeholder="Tell something about yourself"
+            onChangeText={(bio) => this.setState({ bio })}
           />
 
           <Button
-            title="Login"
+            title="Update"
             onPress={() => {
-              const url = `${Constants.SERVER_ADDR}/login`;
+              const url = `${Constants.SERVER_ADDR}/updateProfile`;
               fetch(url, {
                 method: "POST",
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({
+                  loginToken: global.device.loginToken,
+                  image,
+                  name,
+                  bio,
+                }),
               })
                 .then((response) => response.json())
                 .then(({ response, loginToken }) => {
                   this.setState({ response });
-
-                  if (loginToken) {
-                    global.dispatch({ type: "SET_LOGGED", value: true });
-                    global.dispatch({
-                      type: "SET_LOGIN_TOKEN",
-                      value: loginToken,
-                    });
-                  }
                 })
                 .catch((error) => {
                   console.log(error, url);
                 });
             }}
           />
-          <Button
-            title="Sign up"
-            onPress={() => navigation.navigate("signup")}
-          />
-
-          {__DEV__ ? (
-            <Button
-              title="Admin"
-              onPress={() => navigation.navigate("adminFranchise")}
-            />
-          ) : null}
         </ScrollView>
       </View>
     );
@@ -102,4 +91,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withGlobalContext(LoginScreen);
+export default withGlobalContext(UpdateProfileScreen);

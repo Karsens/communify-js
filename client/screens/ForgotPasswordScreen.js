@@ -15,7 +15,7 @@ class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Login" });
+    props.navigation.setOptions({ headerTitle: "Forgot password" });
   }
 
   render() {
@@ -41,54 +41,27 @@ class LoginScreen extends React.Component {
             onChangeText={(email) => this.setState({ email })}
           />
 
-          <TextInput
-            style={STYLE.textInput}
-            value={password}
-            placeholder="Password"
-            secureTextEntry
-            onChangeText={(password) => this.setState({ password })}
-          />
-
           <Button
-            title="Login"
+            title="Request password"
             onPress={() => {
-              const url = `${Constants.SERVER_ADDR}/login`;
+              const url = `${Constants.SERVER_ADDR}/forgotPassword`;
               fetch(url, {
                 method: "POST",
                 headers: {
                   Accept: "application/json",
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, fid: Constants.FRANCHISE.id }),
               })
                 .then((response) => response.json())
                 .then(({ response, loginToken }) => {
                   this.setState({ response });
-
-                  if (loginToken) {
-                    global.dispatch({ type: "SET_LOGGED", value: true });
-                    global.dispatch({
-                      type: "SET_LOGIN_TOKEN",
-                      value: loginToken,
-                    });
-                  }
                 })
                 .catch((error) => {
                   console.log(error, url);
                 });
             }}
           />
-          <Button
-            title="Sign up"
-            onPress={() => navigation.navigate("signup")}
-          />
-
-          {__DEV__ ? (
-            <Button
-              title="Admin"
-              onPress={() => navigation.navigate("adminFranchise")}
-            />
-          ) : null}
         </ScrollView>
       </View>
     );

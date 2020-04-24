@@ -1,6 +1,6 @@
 const publicUserFields = [
   "id",
-  "email",
+  "username",
   "name",
   "image",
   "thumbnail",

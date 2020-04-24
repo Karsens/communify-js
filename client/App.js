@@ -19,6 +19,7 @@ import BottomTabNavigator from "./navigation/BottomTabNavigator";
 import WebHomeScreen from "./screens/WebHomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
+import SignupFranchiseScreen from "./screens/SignupFranchiseScreen";
 import AdminFranchiseScreen from "./screens/AdminFranchiseScreen";
 import AdminScreen from "./screens/AdminScreen";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -64,6 +65,22 @@ function App({ global }) {
   if (!isLoadingComplete) {
     return null;
   } else {
+    let sub = undefined;
+    if (Platform.OS === "web") {
+      const url = window.location.hostname.split("."); //something like tribes.communify.cc
+      const numberForSub = url[1] === "localhost" ? 2 : 3;
+      sub = url.length === numberForSub ? url[0] : undefined;
+    }
+
+    const initialRouteName =
+      Platform.OS === "web"
+        ? sub
+          ? "app"
+          : "home"
+        : global.device.logged
+        ? "app"
+        : "login";
+
     return (
       <View
         style={{
@@ -76,27 +93,20 @@ function App({ global }) {
           ref={containerRef}
           initialState={initialNavigationState}
         >
-          <Stack.Navigator
-            initialRouteName={
-              Platform.OS === "web"
-                ? "home"
-                : global.device.logged
-                ? "app"
-                : "login"
-            }
-          >
+          <Stack.Navigator initialRouteName={initialRouteName}>
             <Stack.Screen name="app" component={BottomTabNavigator} />
             {!global.device.logged ? (
               <>
+                <Stack.Screen name="home" component={WebHomeScreen} />
                 <Stack.Screen name="login" component={LoginScreen} />
                 <Stack.Screen name="signup" component={SignupScreen} />
+                <Stack.Screen name="create" component={SignupFranchiseScreen} />
                 <Stack.Screen
                   name="forgotPassword"
                   component={ForgotPasswordScreen}
                 />
               </>
             ) : null}
-            <Stack.Screen name="home" component={WebHomeScreen} />
             <Stack.Screen
               name="adminFranchise"
               component={AdminFranchiseScreen}

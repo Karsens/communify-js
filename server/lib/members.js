@@ -1,9 +1,12 @@
 const { Op } = require("sequelize");
 const { publicUserFields } = require("./util");
 const members = (req, res, User) => {
-  //return coordinatesets that are located in a square of lat/lng
+  const { order, fid } = req.query;
 
-  const { order } = req.query;
+  if (!fid) {
+    res.json({ response: "no fid given" });
+    return;
+  }
 
   const validOrders = ["onlineAt"];
   const validOrder = validOrders.includes(order) ? order : validOrders[0];
@@ -12,7 +15,7 @@ const members = (req, res, User) => {
     attributes: publicUserFields,
     order: [[validOrder, "DESC"]],
     limit: 100,
-    where: {},
+    where: { fid },
   }).then((user) => {
     res.json(user);
   });

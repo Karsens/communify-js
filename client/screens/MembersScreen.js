@@ -5,23 +5,67 @@ import {
   Platform,
   StyleSheet,
   Text,
+  FlatList,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import { withGlobalContext } from "../GlobalContext";
+import Constants from "../Constants";
+class HomeScreen extends React.Component {
+  constructor(props) {
+    super(props);
 
-function HomeScreen({ global }) {
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-      >
-        <Text>Members</Text>
-      </ScrollView>
-    </View>
-  );
+    this.state = {
+      members: [],
+    };
+  }
+
+  componentDidMount() {
+    this.fetchMembers();
+  }
+
+  fetchMembers = () => {
+    fetch(`${Constants.SERVER_ADDR}/members?fid=${Constants.FRANCHISE.id}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((members) => {
+        this.setState({ members });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  render() {
+    const { members } = this.state;
+    const { navigation } = this.props;
+    return (
+      <View style={styles.container}>
+        <FlatList
+          data={members}
+          renderItem={({ item, index }) => {
+            return (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("profile", { username: item.username })
+                }
+              >
+                <View>
+                  <Text>User:{item?.username}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          }}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    );
+  }
 }
 
 HomeScreen.navigationOptions = {

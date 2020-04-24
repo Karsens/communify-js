@@ -10,19 +10,21 @@ class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Signup" });
+    props.navigation.setOptions({ headerTitle: "Create your community" });
 
     this.state = {
+      franchise: "",
+      username: "",
       email: "",
       password: "",
       password2: "",
-      username: "",
     };
   }
 
   render() {
     const { navigation, global } = this.props;
     const {
+      franchise,
       username,
       email,
       password,
@@ -43,6 +45,13 @@ class LoginScreen extends React.Component {
           <View style={{ height: 40 }}>
             <Text>{response}</Text>
           </View>
+          <TextInput
+            style={STYLE.textInput}
+            value={franchise}
+            placeholder="Community name"
+            onChangeText={(franchise) => this.setState({ franchise })}
+          />
+
           <TextInput
             style={STYLE.textInput}
             value={email}
@@ -83,7 +92,7 @@ class LoginScreen extends React.Component {
                 });
               } else {
                 this.setState({ response: "", loading: true });
-                const url = `${Constants.SERVER_ADDR}/signup`;
+                const url = `${Constants.SERVER_ADDR}/signupFranchise`;
                 fetch(url, {
                   method: "POST",
                   headers: {
@@ -94,7 +103,7 @@ class LoginScreen extends React.Component {
                     email,
                     password,
                     username,
-                    fid: Constants.FRANCHISE.id,
+                    franchise,
                   }),
                 })
                   .then((response) => response.json())

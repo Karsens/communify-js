@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  Linking,
   FlatList,
   View,
 } from "react-native";
@@ -37,36 +38,57 @@ export default class HomeScreen extends React.Component {
 
   renderItem = ({ item }) => {
     return (
-      <View>
-        <Text>{item.name}</Text>
-      </View>
+      <TouchableOpacity
+        onPress={() => {
+          const host = window.location.host.split(".").splice(0, 2);
+          Linking.openURL(`https://${item.slug}.${host}`);
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "#CCC",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 100,
+            height: 100,
+            borderRadius: 10,
+            marginRight: 10,
+          }}
+        >
+          <Text>{item.name}</Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
   render() {
-    const { navigation } = this.props;
+    const { navigation, route } = this.props;
     const { franchises } = this.state;
+
     return (
       <View style={styles.container}>
-        <Text style={{ fontSize: 26 }}>Your Coworking Community App</Text>
-        <Text>
-          All Coworking spaces need a platform where their Coworkers can find
-          eachother and see what they are working on. Slack is too impersonal,
-          Facebook groups are too messy and covered up between other FB posts.
-          The good news? Communify solves this.
+        <Text
+          style={{ fontSize: 26, fontFamily: "Recoleta", fontWeight: "bold" }}
+        >
+          Bring your community, online courses, and memberships together in one
+          place.
         </Text>
 
-        <Button title="Login" onPress={() => navigation.navigate("login")} />
-        <Button title="Root" onPress={() => navigation.navigate("app")} />
-
-        <FlatList data={franchises} renderItem={this.renderItem} />
-
-        {__DEV__ ? (
+        <View style={{ flexDirection: "row" }}>
+          <View></View>
           <Button
-            title="Admin"
-            onPress={() => navigation.navigate("adminFranchise")}
+            title="Start free"
+            onPress={() => navigation.navigate("create")}
           />
-        ) : null}
+          <View />
+        </View>
+
+        <Text>These communities went before you. Click to see them live.</Text>
+        <FlatList
+          data={franchises}
+          renderItem={this.renderItem}
+          keyExtractor={(item, index) => `item${index}`}
+        />
       </View>
     );
   }
@@ -80,6 +102,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    padding: 20,
   },
   developmentModeText: {
     marginBottom: 20,

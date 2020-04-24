@@ -13,8 +13,6 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 var cors = require("cors");
 
-const EMAIL_FROM = "info@mastercrimez.nl";
-
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "database/db2.sqlite",
@@ -32,6 +30,7 @@ User.init(
     level: DataTypes.INTEGER,
     email: DataTypes.STRING,
     name: DataTypes.STRING,
+    username: DataTypes.STRING,
     image: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
 
@@ -52,6 +51,7 @@ class Franchise extends Model {}
 Franchise.init(
   {
     name: DataTypes.STRING,
+    slug: DataTypes.STRING,
     image: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
   },
@@ -292,6 +292,16 @@ server.post("/login", (req, res) => require("./login").login(req, res, User));
 
 server.post("/signup", (req, res) =>
   require("./signup").signup(req, res, User, Franchise)
+);
+
+server.post("/signupFranchise", (req, res) =>
+  require("./signupFranchise").signupFranchise(
+    req,
+    res,
+    User,
+    Franchise,
+    Community
+  )
 );
 
 server.get("/franchises", (req, res) =>

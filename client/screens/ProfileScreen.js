@@ -5,28 +5,56 @@ import {
   Platform,
   StyleSheet,
   Text,
+  FlatList,
   TouchableOpacity,
   View,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
 import { withGlobalContext } from "../GlobalContext";
+import Constants from "../Constants";
+class ProfileScreen extends React.Component {
+  constructor(props) {
+    super(props);
 
-function HomeScreen({ global }) {
-  return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.contentContainer}
-      >
-        <Text>Posts come here</Text>
-      </ScrollView>
-    </View>
-  );
+    this.state = {
+      user: null,
+    };
+  }
+
+  componentDidMount() {
+    this.fetchMember();
+  }
+
+  fetchMember = () => {
+    const url = `${Constants.SERVER_ADDR}/profile?username=${this.props.route.params?.username}&fid=${Constants.FRANCHISE.id}`;
+    console.log(url);
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((user) => {
+        this.setState({ user });
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
+  render() {
+    const { user } = this.state;
+    const { navigation } = this.props;
+    return (
+      <View style={styles.container}>
+        <View>
+          <Text>User:{user?.id.toString()}</Text>
+        </View>
+      </View>
+    );
+  }
 }
-
-HomeScreen.navigationOptions = {
-  header: null,
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -35,4 +63,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withGlobalContext(HomeScreen);
+export default withGlobalContext(ProfileScreen);

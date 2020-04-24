@@ -79,6 +79,10 @@ class LoginScreen extends React.Component {
             }}
           />
           <Button
+            title="Forgot password?"
+            onPress={() => navigation.navigate("forgotPassword")}
+          />
+          <Button
             title="Sign up"
             onPress={() => navigation.navigate("signup")}
           />
