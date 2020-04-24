@@ -3,6 +3,7 @@ const server = express();
 const body_parser = require("body-parser");
 const sgMail = require("@sendgrid/mail");
 var http = require("http");
+const listEndpoints = require("express-list-endpoints");
 
 const { Sequelize, Model, DataTypes, Op } = require("sequelize");
 
@@ -306,20 +307,8 @@ server.post("/deleteFranchise", (req, res) =>
 const port = process.env.PORT || 4001;
 
 server.get("/", (req, res) => {
-  res.send("this is an secure server");
+  res.send(listEndpoints(server));
 });
-
-// https
-//   .createServer(
-//     {
-//       key: fs.readFileSync("server.key"),
-//       cert: fs.readFileSync("server.cert"),
-//     },
-//     server
-//   )
-//   .listen(port, () => {
-//     console.log(`Server listening at ${port}`);
-//   });
 
 http
   .createServer(server)
