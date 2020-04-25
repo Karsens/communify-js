@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 class ProfileScreen extends React.Component {
@@ -21,6 +22,25 @@ class ProfileScreen extends React.Component {
     this.state = {
       user: null,
     };
+
+    const isMe = props.route.params?.username === props.global.me?.username;
+
+    props.navigation.setOptions({
+      headerTitle: props.route.params?.username,
+      headerRight: isMe
+        ? () => (
+            <TouchableOpacity
+              onPress={() => props.navigation.navigate("updateProfile")}
+            >
+              <Ionicons
+                name="md-create"
+                size={24}
+                style={{ marginRight: 10 }}
+              />
+            </TouchableOpacity>
+          )
+        : undefined,
+    });
   }
 
   componentDidMount() {
@@ -30,7 +50,7 @@ class ProfileScreen extends React.Component {
   fetchMember = () => {
     const { global } = this.props;
     const url = `${Constants.SERVER_ADDR}/profile?username=${this.props.route.params?.username}&fid=${global.franchise?.id}`;
-    console.log(url);
+
     fetch(url, {
       method: "GET",
       headers: {
@@ -63,16 +83,7 @@ class ProfileScreen extends React.Component {
               style={{ width, height: 512, borderRadius: 24 }}
               resizeMode="contain"
             />
-          ) : (
-            <View
-              style={{
-                width: 512,
-                height: 512,
-                backgroundColor: "#CCC",
-                borderRadius: 24,
-              }}
-            />
-          )}
+          ) : null}
 
           <Text>User:{user?.id.toString()}</Text>
         </View>

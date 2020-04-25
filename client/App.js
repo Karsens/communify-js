@@ -18,6 +18,8 @@ import { persistor, store } from "./Store";
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
 
 import WebHomeScreen from "./screens/WebHomeScreen";
+import CreatePostScreen from "./screens/CreatePostScreen";
+import PostScreen from "./screens/PostScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
 import SignupFranchiseScreen from "./screens/SignupFranchiseScreen";
@@ -25,6 +27,7 @@ import AdminFranchiseScreen from "./screens/AdminFranchiseScreen";
 import AdminScreen from "./screens/AdminScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import UpdateProfileScreen from "./screens/UpdateProfileScreen";
+import UpdateFranchiseScreen from "./screens/UpdateFranchiseScreen";
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
@@ -114,6 +117,8 @@ function App({ global }) {
             ) : null}
 
             <Stack.Screen name="app" component={BottomTabNavigator} />
+            <Stack.Screen name="createPost" component={CreatePostScreen} />
+            <Stack.Screen name="post" component={PostScreen} />
 
             <Stack.Screen
               name="adminFranchise"
@@ -125,6 +130,10 @@ function App({ global }) {
             <Stack.Screen
               name="updateProfile"
               component={UpdateProfileScreen}
+            />
+            <Stack.Screen
+              name="updateFranchise"
+              component={UpdateFranchiseScreen}
             />
             <Stack.Screen
               name="changePassword"

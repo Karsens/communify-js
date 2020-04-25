@@ -49,12 +49,13 @@ export default class HomeScreen extends React.Component {
             backgroundColor: "#CCC",
             justifyContent: "center",
             alignItems: "center",
-            width: 100,
-            height: 100,
-            borderRadius: 10,
             marginRight: 10,
           }}
         >
+          <Image
+            source={{ uri: Constants.SERVER_ADDR + item.thumbnail }}
+            style={{ width: 100, height: 100 }}
+          />
           <Text>{item.name}</Text>
         </View>
       </TouchableOpacity>

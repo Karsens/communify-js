@@ -1,18 +1,18 @@
 const fs = require("fs");
 const Jimp = require("jimp");
 
-const update = async (req, res, User) => {
+const update = async (req, res, User, Franchise) => {
   const { loginToken, name, image, bio } = req.body;
 
   if (!loginToken) {
-    res.json({ response: "No token" });
+    res.json({ response: "Geen token" });
     return;
   }
 
   const user = await User.findOne({ where: { loginToken } });
 
   if (!user) {
-    res.json({ response: "Invalid user" });
+    res.json({ response: "Ongeldige user" });
     return;
   }
 
@@ -46,16 +46,8 @@ const update = async (req, res, User) => {
     update.thumbnail = pathThumbnail.substring(1);
   }
 
-  if (name) {
-    update.name = name;
-  }
-
-  if (bio) {
-    update.bio = bio;
-  }
-
-  await User.update(update, { where: { loginToken } });
-  res.json({ response: "Profile updated" });
+  await Franchise.update(update, { where: { id: user.fid } });
+  res.json({ response: "Updated" });
 };
 
 module.exports = { update };

@@ -25,9 +25,8 @@ class UpdateProfileScreen extends React.Component {
     props.navigation.setOptions({ headerTitle: "Update profile" });
 
     this.state = {
-      name: props.global.me?.name,
-      bio: props.global.me?.bio,
-      image: props.global.me?.image,
+      message: "",
+      image: null,
     };
   }
 
@@ -69,7 +68,7 @@ class UpdateProfileScreen extends React.Component {
 
   render() {
     const { navigation, global } = this.props;
-    const { image, name, bio, response, hasEdited } = this.state;
+    const { image, message, response, hasEdited } = this.state;
 
     return (
       <View style={styles.container}>
@@ -93,12 +92,11 @@ class UpdateProfileScreen extends React.Component {
                   source={{
                     uri: hasEdited ? image : Constants.SERVER_ADDR + image,
                   }}
-                  style={{ width: 200, height: 200, borderRadius: 100 }}
+                  style={{ width: 200, height: 200 }}
                 />
               ) : (
                 <View
                   style={{
-                    borderRadius: 100,
                     borderWidth: 2,
                     borderColor: "#CCC",
                     width: 200,
@@ -110,25 +108,18 @@ class UpdateProfileScreen extends React.Component {
           </View>
 
           <TextInput
-            style={STYLE.textInput}
-            value={name}
-            placeholder="Name"
-            onChangeText={(name) => this.setState({ name })}
-          />
-
-          <TextInput
             style={[STYLE.textInput, { height: 200 }]}
             numberOfLines={4}
             multiline
-            value={bio}
-            placeholder="Tell something about yourself"
-            onChangeText={(bio) => this.setState({ bio })}
+            value={message}
+            placeholder="Message"
+            onChangeText={(message) => this.setState({ message })}
           />
 
           <Button
             title="Update"
             onPress={() => {
-              const url = `${Constants.SERVER_ADDR}/updateProfile`;
+              const url = `${Constants.SERVER_ADDR}/post`;
               fetch(url, {
                 method: "POST",
                 headers: {
@@ -138,13 +129,16 @@ class UpdateProfileScreen extends React.Component {
                 body: JSON.stringify({
                   loginToken: global.device.loginToken,
                   image: hasEdited ? image : undefined,
-                  name,
-                  bio,
+                  message,
                 }),
               })
                 .then((response) => response.json())
-                .then(({ response, loginToken }) => {
+                .then(({ response, success }) => {
                   this.setState({ response });
+                  if (success) {
+                    navigation.goBack();
+                    this.props.route.params?.onCreate();
+                  }
                 })
                 .catch((error) => {
                   console.log(error, url);

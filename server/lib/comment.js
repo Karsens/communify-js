@@ -1,8 +1,9 @@
 const fs = require("fs");
 const Jimp = require("jimp");
 
-const update = async (req, res, User) => {
-  const { loginToken, name, image, bio } = req.body;
+const { Op } = require("sequelize");
+const comment = async (req, res, User, Franchise, Post, Comment) => {
+  const { loginToken, pid, message, image } = req.body;
 
   if (!loginToken) {
     res.json({ response: "No token" });
@@ -16,17 +17,21 @@ const update = async (req, res, User) => {
     return;
   }
 
-  let update = {};
+  const post = await Post.findOne({ where: { id: pid, fid: user.fid } });
 
+  if (!post) {
+    res.json({ response: "Post not found" });
+    return;
+  }
+
+  let pathImage = "";
   if (image) {
     // to declare some path to store your converted image
     const path = "./uploads/" + Date.now() + ".png";
-    const pathThumbnail = "./uploads/" + Date.now() + "tn.png";
     // to convert base64 format into random filename
     const base64Data = image.replace(/^data:([A-Za-z-+/]+);base64,/, "");
 
     fs.writeFileSync(path, base64Data, { encoding: "base64" });
-    fs.writeFileSync(pathThumbnail, base64Data, { encoding: "base64" });
 
     Jimp.read(path, (err, image) => {
       if (err) throw err;
@@ -35,27 +40,22 @@ const update = async (req, res, User) => {
         .write(path); // save
     });
 
-    Jimp.read(pathThumbnail, (err, image) => {
-      if (err) throw err;
-      image
-        .scaleToFit(100, 100) // resize
-        .write(pathThumbnail); // save
-    });
-
-    update.image = path.substring(1);
-    update.thumbnail = pathThumbnail.substring(1);
+    pathImage = path.substring(1);
   }
 
-  if (name) {
-    update.name = name;
-  }
+  Post.update(
+    { numComments: post.numComments + 1 },
+    { where: { id: post.id } }
+  );
 
-  if (bio) {
-    update.bio = bio;
-  }
+  Comment.create({
+    uid: user.id,
+    pid: post.id,
+    comment: message,
+    image: pathImage,
+  });
 
-  await User.update(update, { where: { loginToken } });
-  res.json({ response: "Profile updated" });
+  res.json({ response: "Comment added", success: true });
 };
 
-module.exports = { update };
+module.exports = { comment };

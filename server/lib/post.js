@@ -1,8 +1,9 @@
 const fs = require("fs");
 const Jimp = require("jimp");
 
-const update = async (req, res, User) => {
-  const { loginToken, name, image, bio } = req.body;
+const { Op } = require("sequelize");
+const post = async (req, res, User, Franchise, Post, Comment) => {
+  const { loginToken, message, image } = req.body;
 
   if (!loginToken) {
     res.json({ response: "No token" });
@@ -16,17 +17,14 @@ const update = async (req, res, User) => {
     return;
   }
 
-  let update = {};
-
+  let pathImage = "";
   if (image) {
     // to declare some path to store your converted image
     const path = "./uploads/" + Date.now() + ".png";
-    const pathThumbnail = "./uploads/" + Date.now() + "tn.png";
     // to convert base64 format into random filename
     const base64Data = image.replace(/^data:([A-Za-z-+/]+);base64,/, "");
 
     fs.writeFileSync(path, base64Data, { encoding: "base64" });
-    fs.writeFileSync(pathThumbnail, base64Data, { encoding: "base64" });
 
     Jimp.read(path, (err, image) => {
       if (err) throw err;
@@ -35,27 +33,12 @@ const update = async (req, res, User) => {
         .write(path); // save
     });
 
-    Jimp.read(pathThumbnail, (err, image) => {
-      if (err) throw err;
-      image
-        .scaleToFit(100, 100) // resize
-        .write(pathThumbnail); // save
-    });
-
-    update.image = path.substring(1);
-    update.thumbnail = pathThumbnail.substring(1);
+    pathImage = path.substring(1);
   }
 
-  if (name) {
-    update.name = name;
-  }
+  Post.create({ uid: user.id, fid: user.fid, post: message, image: pathImage });
 
-  if (bio) {
-    update.bio = bio;
-  }
-
-  await User.update(update, { where: { loginToken } });
-  res.json({ response: "Profile updated" });
+  res.json({ response: "Post created", success: true });
 };
 
-module.exports = { update };
+module.exports = { post };

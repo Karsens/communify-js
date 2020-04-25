@@ -70,18 +70,43 @@ Community.init(
     name: DataTypes.STRING,
     image: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
+    bio: DataTypes.STRING,
   },
   {
     sequelize,
     modelName: "community",
   }
 );
-Community.belongsTo(Franchise, { foreignKey: "fid" });
-Franchise.hasMany(Community, { foreignKey: "fid" });
-User.belongsTo(Community, { foreignKey: "coid" });
-Community.hasMany(User, { foreignKey: "coid" });
-User.belongsTo(Franchise, { foreignKey: "fid" });
-Franchise.hasMany(User, { foreignKey: "fid" });
+Community.belongsTo(Franchise, {
+  foreignKey: "fid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Franchise.hasMany(Community, {
+  foreignKey: "fid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.belongsTo(Community, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Community.hasMany(User, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.belongsTo(Franchise, {
+  foreignKey: "fid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Franchise.hasMany(User, {
+  foreignKey: "fid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 class CommunitySub extends Model {}
 
@@ -96,11 +121,27 @@ CommunitySub.init(
   }
 );
 
-CommunitySub.belongsTo(User, { foreignKey: "uid" });
-User.hasMany(CommunitySub, { foreignKey: "uid" });
+CommunitySub.belongsTo(User, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.hasMany(CommunitySub, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
-CommunitySub.belongsTo(Community, { foreignKey: "coid" });
-Community.hasMany(CommunitySub, { foreignKey: "coid" });
+CommunitySub.belongsTo(Community, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Community.hasMany(CommunitySub, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 //chat belongs to channel, sub belongs to channel. channel belongs to community
 
@@ -117,8 +158,16 @@ Channel.init(
   }
 );
 
-Channel.belongsTo(Community, { foreignKey: "coid" });
-Community.hasMany(Channel, { foreignKey: "coid" });
+Channel.belongsTo(Community, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Community.hasMany(Channel, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 class ChannelSub extends Model {}
 
@@ -132,11 +181,27 @@ ChannelSub.init(
     modelName: "channelsub",
   }
 );
-ChannelSub.belongsTo(Channel, { foreignKey: "cid" });
-Channel.hasMany(ChannelSub, { foreignKey: "cid" });
+ChannelSub.belongsTo(Channel, {
+  foreignKey: "cid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Channel.hasMany(ChannelSub, {
+  foreignKey: "cid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
-ChannelSub.belongsTo(User, { foreignKey: "uid" });
-User.hasMany(ChannelSub, { foreignKey: "uid" });
+ChannelSub.belongsTo(User, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.hasMany(ChannelSub, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 class Chat extends Model {}
 
@@ -151,11 +216,27 @@ Chat.init(
     modelName: "chat",
   }
 );
-Chat.belongsTo(User, { foreignKey: "uid" });
-User.hasMany(Chat, { foreignKey: "uid" });
+Chat.belongsTo(User, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.hasMany(Chat, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
-Chat.belongsTo(Channel, { foreignKey: "cid" });
-Channel.hasMany(Chat, { foreignKey: "cid" });
+Chat.belongsTo(Channel, {
+  foreignKey: "cid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Channel.hasMany(Chat, {
+  foreignKey: "cid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 // Comments belong to posts
 class Post extends Model {}
@@ -163,7 +244,7 @@ class Post extends Model {}
 Post.init(
   {
     uid: DataTypes.INTEGER,
-    coid: DataTypes.INTEGER,
+    fid: DataTypes.INTEGER,
     post: DataTypes.STRING,
     image: DataTypes.STRING,
     numComments: { type: DataTypes.NUMBER, defaultValue: 0 },
@@ -174,11 +255,27 @@ Post.init(
   }
 );
 
-Post.belongsTo(Community, { foreignKey: "coid" });
-Community.hasMany(Post, { foreignKey: "coid" });
+Post.belongsTo(Franchise, {
+  foreignKey: "fid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Franchise.hasMany(Post, {
+  foreignKey: "fid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
-Post.belongsTo(User, { foreignKey: "uid" });
-User.hasMany(Post, { foreignKey: "uid" });
+Post.belongsTo(User, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.hasMany(Post, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 class Comment extends Model {}
 
@@ -187,6 +284,7 @@ Comment.init(
     uid: DataTypes.INTEGER,
     pid: DataTypes.INTEGER,
     comment: DataTypes.STRING,
+    image: DataTypes.STRING,
   },
   {
     sequelize,
@@ -194,11 +292,27 @@ Comment.init(
   }
 );
 
-Comment.belongsTo(User, { foreignKey: "uid" });
-User.hasMany(Comment, { foreignKey: "uid" });
+Comment.belongsTo(User, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.hasMany(Comment, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
-Comment.belongsTo(Post, { foreignKey: "pid" });
-Post.hasMany(Comment, { foreignKey: "pid" });
+Comment.belongsTo(Post, {
+  foreignKey: "pid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Post.hasMany(Comment, {
+  foreignKey: "pid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 /**
  * companies, teams
@@ -218,8 +332,16 @@ Group.init(
   }
 );
 
-Group.belongsTo(Community, { foreignKey: "coid" });
-Community.hasMany(Group, { foreignKey: "coid" });
+Group.belongsTo(Community, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Community.hasMany(Group, {
+  foreignKey: "coid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 class GroupSub extends Model {}
 
@@ -234,11 +356,27 @@ GroupSub.init(
   }
 );
 
-GroupSub.belongsTo(User, { foreignKey: "uid" });
-User.hasMany(GroupSub, { foreignKey: "uid" });
+GroupSub.belongsTo(User, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+User.hasMany(GroupSub, {
+  foreignKey: "uid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
-GroupSub.belongsTo(Group, { foreignKey: "gid" });
-Group.hasMany(GroupSub, { foreignKey: "gid" });
+GroupSub.belongsTo(Group, {
+  foreignKey: "gid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Group.hasMany(GroupSub, {
+  foreignKey: "gid",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
 
 try {
   sequelize.sync({ alter: true });
@@ -286,6 +424,10 @@ server.post("/updateProfile", (req, res) =>
   require("./updateProfile").update(req, res, User)
 );
 
+server.post("/updateFranchise", (req, res) =>
+  require("./updateFranchise").update(req, res, User, Franchise)
+);
+
 server.post("/changePassword", (req, res) =>
   require("./changePassword").changePassword(req, res, User)
 );
@@ -296,14 +438,12 @@ server.post("/signup", (req, res) =>
   require("./signup").signup(req, res, User, Franchise)
 );
 
+/**
+ * Franchises
+ */
+
 server.post("/signupFranchise", (req, res) =>
-  require("./signupFranchise").signupFranchise(
-    req,
-    res,
-    User,
-    Franchise,
-    Community
-  )
+  require("./signupFranchise").signupFranchise(req, res, User, Franchise)
 );
 
 server.get("/franchises", (req, res) =>
@@ -319,6 +459,29 @@ server.post("/createFranchise", (req, res) =>
 );
 server.post("/deleteFranchise", (req, res) =>
   require("./adminFranchise").deleteFranchise(req, res, User, Franchise)
+);
+
+/**
+ * Posts
+ */
+server.get("/posts", (req, res) =>
+  require("./posts").posts(req, res, User, Franchise, Post)
+);
+
+server.get("/getPost", (req, res) =>
+  require("./getPost").getPost(req, res, User, Franchise, Post, Comment)
+);
+
+server.post("/comment", (req, res) =>
+  require("./comment").comment(req, res, User, Franchise, Post, Comment)
+);
+
+server.post("/post", (req, res) =>
+  require("./post").post(req, res, User, Franchise, Post)
+);
+
+server.post("/deletePost", (req, res) =>
+  require("./deletePost").deletePost(req, res, User, Franchise, Post, Comment)
 );
 
 const port = process.env.PORT || 4001;

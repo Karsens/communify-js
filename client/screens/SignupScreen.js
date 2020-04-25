@@ -54,7 +54,12 @@ class SignupScreen extends React.Component {
       });
 
       if (!result.cancelled) {
-        this.setState({ image: result.uri });
+        this.setState({
+          image:
+            Platform.OS === "web"
+              ? result.uri
+              : "data:image/png;base64," + result.base64,
+        });
       }
 
       console.log(result);

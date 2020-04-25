@@ -4,7 +4,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { GlobalContext } from "../GlobalContext";
 import OptionButton from "../components/OptionButton";
 
-export default function LinksScreen({ navigation }) {
+export default function SettingsScreen({ navigation }) {
   const { dispatch, me } = React.useContext(GlobalContext);
   return (
     <ScrollView

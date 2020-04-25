@@ -5,7 +5,7 @@ const Jimp = require("jimp");
 
 const { isEmail } = require("./util");
 
-const signupFranchise = async (req, res, User, Franchise, Community) => {
+const signupFranchise = async (req, res, User, Franchise) => {
   const { email, password, franchise, username, image } = req.body;
 
   if (!franchise) {
@@ -69,11 +69,6 @@ const signupFranchise = async (req, res, User, Franchise, Community) => {
 
   const createFranchise = await Franchise.create({ name: franchise, slug });
 
-  const createCommunity = await Community.create({
-    name: franchise,
-    fid: createFranchise.id,
-  });
-
   const createdUser = await User.create({
     username,
     email,
@@ -83,7 +78,6 @@ const signupFranchise = async (req, res, User, Franchise, Community) => {
     image: path.substring(1),
     thumbnail: pathThumbnail.substring(1),
     fid: createFranchise.id,
-    coid: createCommunity.id,
   });
 
   res.json({

@@ -3,22 +3,34 @@ import { StyleSheet, Alert } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { GlobalContext } from "../GlobalContext";
 import OptionButton from "../components/OptionButton";
-
+import Constants from "../Constants";
 export default function LinksScreen({ navigation }) {
   const { dispatch, me, device } = React.useContext(GlobalContext);
+
+  console.log("th", me?.thumbnail);
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
       {device.logged ? (
-        <OptionButton
-          icon="md-settings"
-          label="Settings"
-          onPress={() => {
-            navigation.navigate("settings");
-          }}
-        />
+        <>
+          <OptionButton
+            image={{ uri: Constants.SERVER_ADDR + me?.thumbnail }}
+            label="My account"
+            onPress={() => {
+              navigation.navigate("profile", { username: me?.username });
+            }}
+          />
+
+          <OptionButton
+            icon="md-settings"
+            label="Settings"
+            onPress={() => {
+              navigation.navigate("settings");
+            }}
+          />
+        </>
       ) : (
         <>
           <OptionButton

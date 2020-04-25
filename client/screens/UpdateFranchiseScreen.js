@@ -1,33 +1,33 @@
 import * as React from "react";
 import {
   StyleSheet,
-  TouchableOpacity,
-  Text,
   Image,
+  Text,
   TextInput,
-  Platform,
+  TouchableOpacity,
+  Linking,
   View,
+  Platform,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
-
-import Button from "../components/Button";
+import * as ImageManipulator from "expo-image-manipulator";
 
 import { withGlobalContext } from "../GlobalContext";
+
+import Button from "../components/Button";
 import STYLE from "../Style";
 import Constants from "../Constants";
-
-class UpdateProfileScreen extends React.Component {
+class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Update profile" });
+    props.navigation.setOptions({ headerTitle: "Update your franchise" });
 
     this.state = {
-      name: props.global.me?.name,
-      bio: props.global.me?.bio,
-      image: props.global.me?.image,
+      image: props.global.franchise?.image,
+      hasEdited: false,
     };
   }
 
@@ -47,7 +47,7 @@ class UpdateProfileScreen extends React.Component {
   _pickImage = async () => {
     try {
       let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
         aspect: [1, 1],
         base64: true,
@@ -55,13 +55,15 @@ class UpdateProfileScreen extends React.Component {
 
       if (!result.cancelled) {
         this.setState({
+          hasEdited: true,
           image:
             Platform.OS === "web"
               ? result.uri
               : "data:image/png;base64," + result.base64,
-          hasEdited: true,
         });
       }
+
+      console.log(result);
     } catch (E) {
       console.log(E);
     }
@@ -69,7 +71,7 @@ class UpdateProfileScreen extends React.Component {
 
   render() {
     const { navigation, global } = this.props;
-    const { image, name, bio, response, hasEdited } = this.state;
+    const { response, loading, image, hasEdited } = this.state;
 
     return (
       <View style={styles.container}>
@@ -109,26 +111,12 @@ class UpdateProfileScreen extends React.Component {
             </TouchableOpacity>
           </View>
 
-          <TextInput
-            style={STYLE.textInput}
-            value={name}
-            placeholder="Name"
-            onChangeText={(name) => this.setState({ name })}
-          />
-
-          <TextInput
-            style={[STYLE.textInput, { height: 200 }]}
-            numberOfLines={4}
-            multiline
-            value={bio}
-            placeholder="Tell something about yourself"
-            onChangeText={(bio) => this.setState({ bio })}
-          />
-
           <Button
+            loading={loading}
             title="Update"
             onPress={() => {
-              const url = `${Constants.SERVER_ADDR}/updateProfile`;
+              this.setState({ response: "", loading: true });
+              const url = `${Constants.SERVER_ADDR}/updateFranchise`;
               fetch(url, {
                 method: "POST",
                 headers: {
@@ -136,15 +124,13 @@ class UpdateProfileScreen extends React.Component {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  loginToken: global.device.loginToken,
-                  image: hasEdited ? image : undefined,
-                  name,
-                  bio,
+                  image,
+                  loginToken: global.device?.loginToken,
                 }),
               })
                 .then((response) => response.json())
-                .then(({ response, loginToken }) => {
-                  this.setState({ response });
+                .then(async ({ response }) => {
+                  this.setState({ response, loading: false });
                 })
                 .catch((error) => {
                   console.log(error, url);
@@ -164,4 +150,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withGlobalContext(UpdateProfileScreen);
+export default withGlobalContext(LoginScreen);

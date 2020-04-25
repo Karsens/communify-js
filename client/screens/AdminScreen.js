@@ -10,6 +10,15 @@ export default function LinksScreen({ navigation }) {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
+      {me?.level >= 5 ? (
+        <OptionButton
+          icon="ios-color-wand"
+          label="Update franchise"
+          onPress={() => {
+            navigation.navigate("updateFranchise");
+          }}
+        />
+      ) : null}
       {me?.level === 10 || __DEV__ ? (
         <OptionButton
           icon="ios-color-wand"

@@ -12,7 +12,6 @@ const me = (req, res, User) => {
     where: { loginToken: token },
   })
     .then(async (user) => {
-      console.log("USER", user);
       if (user) {
         await User.update(
           { onlineAt: Date.now() },
