@@ -15,7 +15,7 @@ var cors = require("cors");
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: "database/db2.sqlite",
+  storage: "database/db3.sqlite",
   logging: null,
 });
 
@@ -165,6 +165,8 @@ Post.init(
     uid: DataTypes.INTEGER,
     coid: DataTypes.INTEGER,
     post: DataTypes.STRING,
+    image: DataTypes.STRING,
+    numComments: { type: DataTypes.NUMBER, defaultValue: 0 },
   },
   {
     sequelize,
@@ -307,6 +309,11 @@ server.post("/signupFranchise", (req, res) =>
 server.get("/franchises", (req, res) =>
   require("./franchises").franchises(req, res, User, Franchise)
 );
+
+server.get("/franchise", (req, res) =>
+  require("./franchise").franchise(req, res, User, Franchise)
+);
+
 server.post("/createFranchise", (req, res) =>
   require("./adminFranchise").createFranchise(req, res, User, Franchise)
 );

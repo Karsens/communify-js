@@ -15,7 +15,7 @@ class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Login" });
+    props.navigation.setOptions({ headerTitle: global.franchise?.name });
   }
 
   render() {
@@ -59,7 +59,11 @@ class LoginScreen extends React.Component {
                   Accept: "application/json",
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({
+                  email,
+                  password,
+                  fid: global.franchise?.id,
+                }),
               })
                 .then((response) => response.json())
                 .then(({ response, loginToken }) => {

@@ -8,6 +8,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { PersistGate } from "redux-persist/es/integration/react";
 import { connect, Provider } from "react-redux";
+import { patchFlatListProps } from "react-native-web-refresh-control";
 
 import useLinking from "./navigation/useLinking";
 import { GlobalContextProvider } from "./GlobalContext";
@@ -27,8 +28,11 @@ import UpdateProfileScreen from "./screens/UpdateProfileScreen";
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
+import Constants from "./Constants";
 
 const Stack = createStackNavigator();
+
+// patchFlatListProps();
 
 function App({ global }) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -94,19 +98,23 @@ function App({ global }) {
           initialState={initialNavigationState}
         >
           <Stack.Navigator initialRouteName={initialRouteName}>
-            <Stack.Screen name="app" component={BottomTabNavigator} />
+            {/* home is always available */}
+            <Stack.Screen name="home" component={WebHomeScreen} />
+            <Stack.Screen name="create" component={SignupFranchiseScreen} />
+
             {!global.device.logged ? (
               <>
-                <Stack.Screen name="home" component={WebHomeScreen} />
                 <Stack.Screen name="login" component={LoginScreen} />
                 <Stack.Screen name="signup" component={SignupScreen} />
-                <Stack.Screen name="create" component={SignupFranchiseScreen} />
                 <Stack.Screen
                   name="forgotPassword"
                   component={ForgotPasswordScreen}
                 />
               </>
             ) : null}
+
+            <Stack.Screen name="app" component={BottomTabNavigator} />
+
             <Stack.Screen
               name="adminFranchise"
               component={AdminFranchiseScreen}
@@ -131,11 +139,18 @@ function App({ global }) {
 
 class _RootContainer extends React.Component {
   componentDidMount() {
-    const { device, reloadMe, dispatch } = this.props;
+    const { device, reloadMe, reloadFranchise, dispatch } = this.props;
 
-    let token = device.loginToken;
+    reloadMe(device.loginToken);
 
-    reloadMe(token);
+    let sub = Constants.FRANCHISE.slug;
+    if (Platform.OS === "web") {
+      const url = window.location.hostname.split("."); //something like tribes.communify.cc
+      const numberForSub = url[1] === "localhost" ? 2 : 3;
+      sub = url.length === numberForSub ? url[0] : undefined;
+    }
+
+    reloadFranchise(sub);
   }
 
   componentDidUpdate(prevProps) {
@@ -159,14 +174,16 @@ class _RootContainer extends React.Component {
   }
 }
 
-const mapStateToProps = ({ device, me }) => {
+const mapStateToProps = ({ device, me, franchise }) => {
   //console.log("State gets mapped to props... device only");
-  return { device, me };
+  return { device, me, franchise };
 }; //
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
   reloadMe: (loginToken) =>
     dispatch({ type: "ME_FETCH_REQUESTED", payload: { loginToken } }),
+  reloadFranchise: (slug) =>
+    dispatch({ type: "FRANCHISE_FETCH_REQUESTED", payload: { slug } }),
 });
 
 const RootContainer = connect(

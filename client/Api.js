@@ -18,5 +18,25 @@ const fetchMe = (payload) => {
       console.log(error, url);
     });
 };
-const Api = { fetchMe };
+
+const fetchFranchise = (payload) => {
+  const url = `${Constants.SERVER_ADDR}/franchise?slug=${payload.slug}`;
+
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then(async (franchise) => {
+      return franchise;
+    })
+    .catch((error) => {
+      console.log(error, url);
+    });
+};
+
+const Api = { fetchMe, fetchFranchise };
 export default Api;

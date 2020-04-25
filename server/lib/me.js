@@ -12,10 +12,14 @@ const me = (req, res, User) => {
     where: { loginToken: token },
   })
     .then(async (user) => {
+      console.log("USER", user);
       if (user) {
-        res.json(user);
+        await User.update(
+          { onlineAt: Date.now() },
+          { where: { loginToken: token } }
+        );
 
-        User.update({ onlineAt: Date.now() }, { where: { loginToken: token } });
+        res.json(user);
       } else {
         res.json(null);
       }

@@ -51,7 +51,7 @@ class LoginScreen extends React.Component {
                   Accept: "application/json",
                   "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email, fid: Constants.FRANCHISE.id }),
+                body: JSON.stringify({ email, fid: global.franchise?.id }),
               })
                 .then((response) => response.json())
                 .then(({ response, loginToken }) => {

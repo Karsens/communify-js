@@ -2,13 +2,19 @@ const { Sequelize } = require("sequelize");
 const md5 = require("md5");
 
 const login = async (req, res, User) => {
-  const { email, password } = req.body;
+  const { email, password, fid } = req.body;
+  if (!fid) {
+    res.json({ response: "Please fill in a franchise" });
+    return;
+  }
 
   if (!email) {
     res.json({ response: "Please fill in an email" });
+    return;
   }
   if (!password) {
     res.json({ response: "Please fill in a password" });
+    return;
   }
 
   const user = await User.findOne({
@@ -18,6 +24,7 @@ const login = async (req, res, User) => {
         Sequelize.fn("lower", email)
       ),
       password: md5(password),
+      fid,
     },
   });
 

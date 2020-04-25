@@ -3,7 +3,6 @@ const md5 = require("md5");
 const changePassword = async (req, res, User) => {
   const { token, password, passwordOld } = req.body;
 
-  console.log("we get here");
   if (!token || !password || !passwordOld) {
     res.json({ response: "Fill in all fields, please" });
     return;

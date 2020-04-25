@@ -12,15 +12,18 @@ function* fetchMe(action) {
   }
 }
 
-/*
-  Alternatively you may use takeLatest.
+function* fetchFranchise(action) {
+  try {
+    const franchise = yield call(Api.fetchFranchise, action.payload);
+    yield put({ type: "FRANCHISE_FETCH_SUCCEEDED", franchise });
+  } catch (e) {
+    yield put({ type: "FRANCHISE_FETCH_FAILED", message: e.message });
+  }
+}
 
-  Does not allow concurrent fetches of user. If "USER_FETCH_REQUESTED" gets
-  dispatched while a fetch is already pending, that pending fetch is cancelled
-  and only the latest one will be run.
-*/
 function* mySaga() {
   yield takeLatest("ME_FETCH_REQUESTED", fetchMe);
+  yield takeLatest("FRANCHISE_FETCH_REQUESTED", fetchFranchise);
 }
 
 export default mySaga;

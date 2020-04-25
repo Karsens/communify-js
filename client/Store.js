@@ -43,10 +43,25 @@ const meReducer = (state = initMe, action) => {
   }
 };
 
+const initFranchise = null;
+const franchiseReducer = (state = initMe, action) => {
+  switch (action.type) {
+    case "FRANCHISE_FETCH_SUCCEEDED": {
+      return action.franchise;
+    }
+
+    case "FRANCHISE_FETCH_FAILED": {
+      return state;
+    }
+    default:
+      return state;
+  }
+};
+
 const config = {
   key: "v1",
   storage: AsyncStorage,
-  whitelist: ["device", "me"],
+  whitelist: ["device", "me", "franchise"],
 };
 
 const sagaMiddleware = createSagaMiddleware();
@@ -54,6 +69,7 @@ const sagaMiddleware = createSagaMiddleware();
 const reducers = {
   device: deviceReducer,
   me: meReducer,
+  franchise: franchiseReducer,
 };
 
 const rootReducer = persistCombineReducers(config, reducers);

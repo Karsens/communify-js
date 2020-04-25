@@ -46,8 +46,7 @@ const deleteFranchise = async (req, res, User, Franchise) => {
     where: { id },
   });
 
-  const destroy = franchise.destroy();
-  console.log("destroy?", destroy);
+  const destroy = await franchise.destroy();
 
   if (!destroy) {
     res.json({ response: "Something went wrong" });

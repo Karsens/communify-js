@@ -19,6 +19,7 @@ function HomeScreen({ global }) {
         contentContainerStyle={styles.contentContainer}
       >
         <Text>Posts come here</Text>
+        <Text>{JSON.stringify(global)}</Text>
       </ScrollView>
     </View>
   );
