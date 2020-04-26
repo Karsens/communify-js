@@ -327,8 +327,12 @@ server.use(
 
 server.use(function (req, res, next) {
   // Website you wish to allow to connect
-  res.setHeader("Access-Control-Allow-Origin", "https://communify.cc");
-  res.setHeader("Access-Control-Allow-Origin", "https://*.communify.cc");
+  res.setHeader("Access-Control-Allow-Origin", [
+    "https://communify.cc",
+    "https://*.communify.cc",
+    "https://localhost:19006",
+    "https://*.localhost:19006",
+  ]);
 
   // Request methods you wish to allow
   res.setHeader(
