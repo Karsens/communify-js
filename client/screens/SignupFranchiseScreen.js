@@ -10,9 +10,7 @@ import {
   Platform,
 } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import * as ImagePicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
-import * as ImageManipulator from "expo-image-manipulator";
+import ImageInput from "../components/ImageInput";
 
 import { withGlobalContext } from "../GlobalContext";
 
@@ -34,44 +32,6 @@ class LoginScreen extends React.Component {
       image: null,
     };
   }
-
-  componentDidMount() {
-    this.getPermissionAsync();
-  }
-
-  getPermissionAsync = async () => {
-    if (Platform.OS === "ios") {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
-      }
-    }
-  };
-
-  _pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
-        base64: true,
-      });
-
-      if (!result.cancelled) {
-        this.setState({
-          image:
-            Platform.OS === "web"
-              ? result.uri
-              : "data:image/png;base64," + result.base64,
-        });
-      }
-
-      console.log(result);
-    } catch (E) {
-      console.log(E);
-    }
-  };
-
   render() {
     const { navigation, global } = this.props;
     const {
@@ -98,28 +58,15 @@ class LoginScreen extends React.Component {
             <Text>{response}</Text>
           </View>
 
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <TouchableOpacity onPress={this._pickImage}>
-              {image ? (
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 200, height: 200, borderRadius: 100 }}
-                />
-              ) : (
-                <View
-                  style={{
-                    borderRadius: 100,
-                    borderWidth: 2,
-                    borderColor: "#CCC",
-                    width: 200,
-                    height: 200,
-                  }}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
+          <ImageInput
+            value={image}
+            onChange={(base64) =>
+              this.setState({
+                hasEdited: true,
+                image: base64,
+              })
+            }
+          />
 
           <TextInput
             style={STYLE.textInput}
@@ -196,7 +143,10 @@ class LoginScreen extends React.Component {
                         type: "SET_LOGIN_TOKEN",
                         value: loginToken,
                       });
-                      const host = window.location.host.split(".").splice(0, 2);
+                      const host = window.location.host
+                        .split(".")
+                        .splice(0, 2)
+                        .join(".");
                       Linking.openURL(`https://${slug}.${host}`);
                     }
                   })

@@ -46,7 +46,7 @@ export default class HomeScreen extends React.Component {
     return (
       <TouchableOpacity
         onPress={() => {
-          const host = window.location.host.split(".").splice(0, 2);
+          const host = window.location.host.split(".").splice(0, 2).join(".");
           Linking.openURL(`https://${item.slug}.${host}`);
         }}
       >
@@ -57,10 +57,14 @@ export default class HomeScreen extends React.Component {
             marginRight: 10,
           }}
         >
-          <Image
-            source={{ uri: Constants.SERVER_ADDR + item.thumbnail }}
-            style={{ width: 100, height: 100, borderRadius: 5 }}
-          />
+          {item.thumbnail ? (
+            <Image
+              source={{ uri: Constants.SERVER_ADDR + item.thumbnail }}
+              style={{ width: 100, height: 100, borderRadius: 5 }}
+            />
+          ) : (
+            <View style={{ width: 100, height: 100 }} />
+          )}
           <Text>{item.name}</Text>
         </View>
       </TouchableOpacity>

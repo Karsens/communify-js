@@ -11,6 +11,7 @@ import {
 import { ScrollView } from "react-native-gesture-handler";
 import { withGlobalContext } from "../GlobalContext";
 
+import ImageInput from "../components/ImageInput";
 import Button from "../components/Button";
 import STYLE from "../Style";
 import Constants from "../Constants";
@@ -30,43 +31,6 @@ class SignupScreen extends React.Component {
       username: "",
     };
   }
-
-  componentDidMount() {
-    this.getPermissionAsync();
-  }
-
-  getPermissionAsync = async () => {
-    if (Platform.OS === "ios") {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
-      }
-    }
-  };
-
-  _pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
-        base64: true,
-      });
-
-      if (!result.cancelled) {
-        this.setState({
-          image:
-            Platform.OS === "web"
-              ? result.uri
-              : "data:image/png;base64," + result.base64,
-        });
-      }
-
-      console.log(result);
-    } catch (E) {
-      console.log(E);
-    }
-  };
 
   render() {
     const { navigation, global } = this.props;
@@ -93,28 +57,15 @@ class SignupScreen extends React.Component {
             <Text>{response}</Text>
           </View>
 
-          <View
-            style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-          >
-            <TouchableOpacity onPress={this._pickImage}>
-              {image ? (
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 200, height: 200, borderRadius: 100 }}
-                />
-              ) : (
-                <View
-                  style={{
-                    borderRadius: 100,
-                    borderWidth: 2,
-                    borderColor: "#CCC",
-                    width: 200,
-                    height: 200,
-                  }}
-                />
-              )}
-            </TouchableOpacity>
-          </View>
+          <ImageInput
+            value={image}
+            onChange={(base64) =>
+              this.setState({
+                hasEdited: true,
+                image: base64,
+              })
+            }
+          />
 
           <TextInput
             style={STYLE.textInput}

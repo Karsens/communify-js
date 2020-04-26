@@ -10,7 +10,7 @@ export default function LinksScreen({ navigation }) {
       style={styles.container}
       contentContainerStyle={styles.contentContainer}
     >
-      {me?.level >= 5 ? (
+      {__DEV__ || me?.level >= 5 ? (
         <OptionButton
           icon="ios-color-wand"
           label="Update franchise"

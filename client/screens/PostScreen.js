@@ -11,9 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
-
 import { RefreshControl } from "react-native-web-refresh-control";
 import moment from "moment";
 import STYLE from "../Style";
@@ -23,7 +20,8 @@ const isBigDevice = width > 500;
 import Button from "../components/Button";
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
-import { Ionicons } from "@expo/vector-icons";
+import ImageInput from "../components/ImageInput";
+
 class PostsScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -44,7 +42,6 @@ class PostsScreen extends React.Component {
 
   componentDidMount() {
     this.fetchPost();
-    this.getPermissionAsync();
   }
 
   fetchPost = () => {
@@ -125,38 +122,6 @@ class PostsScreen extends React.Component {
     );
   };
 
-  getPermissionAsync = async () => {
-    if (Platform.OS === "ios") {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      if (status !== "granted") {
-        alert("Sorry, we need camera roll permissions to make this work!");
-      }
-    }
-  };
-
-  _pickImage = async () => {
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        base64: true,
-      });
-
-      if (!result.cancelled) {
-        this.setState({
-          image:
-            Platform.OS === "web"
-              ? result.uri
-              : "data:image/png;base64," + result.base64,
-          hasEdited: true,
-        });
-      }
-    } catch (E) {
-      console.log(E);
-    }
-  };
-
   renderHeader = () => {
     const item = this.state.post?.post;
     const maxWidth = width > 500 ? 500 : width;
@@ -220,29 +185,16 @@ class PostsScreen extends React.Component {
         </View>
 
         <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity onPress={this._pickImage}>
-            {image ? (
-              <Image
-                source={{
-                  uri: hasEdited ? image : Constants.SERVER_ADDR + image,
-                }}
-                style={{ width: 50, height: 50 }}
-              />
-            ) : (
-              <View
-                style={{
-                  borderWidth: 2,
-                  borderColor: "#CCC",
-                  width: 50,
-                  height: 50,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Ionicons name="md-camera" color="#CCC" size={30} />
-              </View>
-            )}
-          </TouchableOpacity>
+          <ImageInput
+            small
+            value={image}
+            onChange={(base64) =>
+              this.setState({
+                hasEdited: true,
+                image: base64,
+              })
+            }
+          />
 
           <TextInput
             style={[STYLE.textInput, { height: 100, flex: 1 }]}
