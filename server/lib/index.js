@@ -79,33 +79,21 @@ Community.init(
 );
 Community.belongsTo(Franchise, {
   foreignKey: "fid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Franchise.hasMany(Community, {
   foreignKey: "fid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.belongsTo(Community, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Community.hasMany(User, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.belongsTo(Franchise, {
   foreignKey: "fid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Franchise.hasMany(User, {
   foreignKey: "fid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 class CommunitySub extends Model {}
@@ -123,24 +111,16 @@ CommunitySub.init(
 
 CommunitySub.belongsTo(User, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.hasMany(CommunitySub, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 CommunitySub.belongsTo(Community, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Community.hasMany(CommunitySub, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 //chat belongs to channel, sub belongs to channel. channel belongs to community
@@ -160,13 +140,9 @@ Channel.init(
 
 Channel.belongsTo(Community, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Community.hasMany(Channel, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 class ChannelSub extends Model {}
@@ -183,24 +159,16 @@ ChannelSub.init(
 );
 ChannelSub.belongsTo(Channel, {
   foreignKey: "cid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Channel.hasMany(ChannelSub, {
   foreignKey: "cid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 ChannelSub.belongsTo(User, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.hasMany(ChannelSub, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 class Chat extends Model {}
@@ -218,24 +186,16 @@ Chat.init(
 );
 Chat.belongsTo(User, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.hasMany(Chat, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 Chat.belongsTo(Channel, {
   foreignKey: "cid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Channel.hasMany(Chat, {
   foreignKey: "cid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 // Comments belong to posts
@@ -257,24 +217,16 @@ Post.init(
 
 Post.belongsTo(Franchise, {
   foreignKey: "fid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Franchise.hasMany(Post, {
   foreignKey: "fid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 Post.belongsTo(User, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.hasMany(Post, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 class Comment extends Model {}
@@ -294,24 +246,16 @@ Comment.init(
 
 Comment.belongsTo(User, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.hasMany(Comment, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 Comment.belongsTo(Post, {
   foreignKey: "pid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Post.hasMany(Comment, {
   foreignKey: "pid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 /**
@@ -334,13 +278,9 @@ Group.init(
 
 Group.belongsTo(Community, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Community.hasMany(Group, {
   foreignKey: "coid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 class GroupSub extends Model {}
@@ -358,24 +298,16 @@ GroupSub.init(
 
 GroupSub.belongsTo(User, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 User.hasMany(GroupSub, {
   foreignKey: "uid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 GroupSub.belongsTo(Group, {
   foreignKey: "gid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 Group.hasMany(GroupSub, {
   foreignKey: "gid",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
 });
 
 try {
@@ -484,7 +416,7 @@ server.post("/deletePost", (req, res) =>
   require("./deletePost").deletePost(req, res, User, Franchise, Post, Comment)
 );
 
-const port = process.env.PORT || 4001;
+const port = process.env.PORT || 4003;
 
 server.get("/", (req, res) => {
   res.send(listEndpoints(server));

@@ -30,7 +30,7 @@ class PostsScreen extends React.Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
-      this.fetchPosts();
+      this.onRefresh();
     }
   }
 

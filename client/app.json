@@ -1,29 +1,40 @@
 {
   "expo": {
-    "name": "communify",
+    "name": "Communify",
+    "description": "Stimulate collaboration in coworking spaces",
     "slug": "communify",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "icon": "./assets/iosLogoNoAlphaNoTransparency.png",
+    "scheme": "communify",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/600x400.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#7394fb"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "notification": {
+      "icon": "./assets/grayscale48x48.png",
+      "color": "#000000",
+      "androidMode": "collapse",
+      "androidCollapsedTitle": "#{unread_notifications} new notifications"
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.progenworks.communify2"
+    },
+    "android": {
+      "package": "com.progenworks.communify2",
+      "versionCode": 1
+    },
+    "extra": {
+      "franchise": {
+        "slug": "tribes"
+      }
     }
   }
 }

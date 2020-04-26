@@ -1,5 +1,5 @@
 const serverAddr = "https://communify.leckrapi.xyz";
-const localAddr = "http://192.168.178.221:4001";
+const localAddr = "http://192.168.178.221:4003";
 const devLocal = true;
 
 const Constants = {

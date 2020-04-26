@@ -16,9 +16,15 @@ import { ScrollView } from "react-native-gesture-handler";
 import Constants from "../Constants";
 
 export default class HomeScreen extends React.Component {
-  state = {
-    franchises: [],
-  };
+  constructor(props) {
+    super(props);
+
+    props.navigation.setOptions({ header: () => null });
+
+    this.state = {
+      franchises: [],
+    };
+  }
   componentDidMount() {
     fetch(`${Constants.SERVER_ADDR}/franchises`, {
       method: "GET",
@@ -46,7 +52,6 @@ export default class HomeScreen extends React.Component {
       >
         <View
           style={{
-            backgroundColor: "#CCC",
             justifyContent: "center",
             alignItems: "center",
             marginRight: 10,
@@ -54,7 +59,7 @@ export default class HomeScreen extends React.Component {
         >
           <Image
             source={{ uri: Constants.SERVER_ADDR + item.thumbnail }}
-            style={{ width: 100, height: 100 }}
+            style={{ width: 100, height: 100, borderRadius: 5 }}
           />
           <Text>{item.name}</Text>
         </View>
@@ -68,11 +73,17 @@ export default class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
+        <View style={{ flex: 1 }} />
+
+        <Image
+          source={require("../assets/icon.png")}
+          style={{ width: 150, height: 150 }}
+        />
         <Text
-          style={{ fontSize: 26, fontFamily: "Recoleta", fontWeight: "bold" }}
+          style={{ fontSize: 26, fontFamily: "space-mono", fontWeight: "bold" }}
         >
           Bring your community, online courses, and memberships together in one
-          place.
+          app.
         </Text>
 
         <View style={{ flexDirection: "row" }}>
@@ -83,10 +94,15 @@ export default class HomeScreen extends React.Component {
           />
           <View />
         </View>
-
-        <Text>These communities went before you. Click to see them live.</Text>
+        <View style={{ margin: 20 }}>
+          <Text>
+            These communities went before you. Click to see them live.
+          </Text>
+        </View>
         <FlatList
           data={franchises}
+          style={{ height: 100, flex: 1 }}
+          horizontal
           renderItem={this.renderItem}
           keyExtractor={(item, index) => `item${index}`}
         />
@@ -95,14 +111,12 @@ export default class HomeScreen extends React.Component {
   }
 }
 
-HomeScreen.navigationOptions = {
-  header: null,
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#7394fb",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 20,
   },
   developmentModeText: {

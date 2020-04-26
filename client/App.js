@@ -9,6 +9,7 @@ import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { PersistGate } from "redux-persist/es/integration/react";
 import { connect, Provider } from "react-redux";
 import { patchFlatListProps } from "react-native-web-refresh-control";
+import { Helmet } from "react-helmet";
 
 import useLinking from "./navigation/useLinking";
 import { GlobalContextProvider } from "./GlobalContext";
@@ -95,6 +96,19 @@ function App({ global }) {
           backgroundColor: "#fff",
         }}
       >
+        {Platform.OS === "web" ? (
+          <Helmet>
+            <title>{global.franchise?.name || "Communify"}</title>
+            <meta
+              name="description"
+              content={
+                global.franchise?.name
+                  ? `A community for ${global.franchise?.name}`
+                  : "Communify is a community platform"
+              }
+            />
+          </Helmet>
+        ) : null}
         {Platform.OS === "ios" && <StatusBar barStyle="default" />}
         <NavigationContainer
           ref={containerRef}
