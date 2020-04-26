@@ -159,6 +159,7 @@ class PostsScreen extends React.Component {
 
   renderHeader = () => {
     const item = this.state.post?.post;
+    const maxWidth = width > 500 ? 500 : width;
 
     if (!item) return null;
     return (

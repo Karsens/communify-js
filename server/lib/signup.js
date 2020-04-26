@@ -1,7 +1,6 @@
 const { Sequelize } = require("sequelize");
 const md5 = require("md5");
-const fs = require("fs");
-const Jimp = require("jimp");
+const { saveImageIfValid } = require("./util");
 
 const { isEmail } = require("./util");
 
@@ -62,34 +61,18 @@ const signup = async (req, res, User, Franchise) => {
     return;
   }
 
-  // to declare some path to store your converted image
-  const path = "./uploads/" + Date.now() + ".png";
-  const pathThumbnail = "./uploads/" + Date.now() + "tn.png";
-  // to convert base64 format into random filename
-  const base64Data = image.replace(/^data:([A-Za-z-+/]+);base64,/, "");
-
-  fs.writeFileSync(path, base64Data, { encoding: "base64" });
-  fs.writeFileSync(pathThumbnail, base64Data, { encoding: "base64" });
-
-  Jimp.read(path, (err, image) => {
-    if (err) throw err;
-    image
-      .scaleToFit(512, 512) // resize
-      .write(path); // save
-  });
-
-  Jimp.read(pathThumbnail, (err, image) => {
-    if (err) throw err;
-    image
-      .scaleToFit(100, 100) // resize
-      .write(pathThumbnail); // save
-  });
+  const { pathImage, pathThumbnail, invalid } = saveImageIfValid(
+    res,
+    image,
+    true
+  );
+  if (invalid) return;
 
   const { dataValues } = await User.create({
     username,
     email,
-    image: path.substring(1),
-    thumbnail: pathThumbnail.substring(1),
+    image: pathImage,
+    thumbnail: pathThumbnail,
     password: md5(password),
     loginToken: Math.round(Math.random() * 9999999999999).toString(),
     fid,

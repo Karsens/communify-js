@@ -117,7 +117,7 @@ class UpdateProfileScreen extends React.Component {
           />
 
           <Button
-            title="Update"
+            title="Create"
             onPress={() => {
               const url = `${Constants.SERVER_ADDR}/post`;
               fetch(url, {
@@ -133,11 +133,10 @@ class UpdateProfileScreen extends React.Component {
                 }),
               })
                 .then((response) => response.json())
-                .then(({ response, success }) => {
+                .then(({ response, success, pid }) => {
                   this.setState({ response });
                   if (success) {
-                    navigation.goBack();
-                    this.props.route.params?.onCreate();
+                    navigation.navigate("posts", { reload: pid });
                   }
                 })
                 .catch((error) => {

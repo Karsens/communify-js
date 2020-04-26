@@ -29,8 +29,8 @@ class PostsScreen extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.route.params?.reload) {
-      //this.fetchPosts();
+    if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
+      this.fetchPosts();
     }
   }
 
@@ -130,9 +130,7 @@ class PostsScreen extends React.Component {
           ListHeaderComponent={() => (
             <Button
               title="Create new post"
-              onPress={() =>
-                navigation.navigate("createPost", { onCreate: this.fetchPosts })
-              }
+              onPress={() => navigation.navigate("createPost")}
             />
           )}
           data={posts}
