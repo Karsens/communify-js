@@ -11,8 +11,8 @@
     "build": "babel lib -d dist",
     "serve": "NODE_ENV=production pm2 start dist/index.js",
     "restart": "pm2 restart dist/index.js",
-    "cluster": "NODE_ENV=production pm2 start dist/index.js -i 0 --name mcz",
-    "clusterReload": "NODE_ENV=production pm2 reload mcz",
+    "cluster": "NODE_ENV=production pm2 start dist/index.js -i 0 --name communify2",
+    "clusterReload": "NODE_ENV=production pm2 reload communify2",
     "reloadAll": "git pull && yarn && yarn build && yarn clusterReload",
     "cloc": "cloc lib ../client/src "
   },
