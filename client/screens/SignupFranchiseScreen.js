@@ -21,7 +21,7 @@ class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Create your community" });
+    props.navigation.setOptions({ headerTitle: "Create your app" });
 
     this.state = {
       franchise: "",
@@ -71,7 +71,7 @@ class LoginScreen extends React.Component {
           <TextInput
             style={STYLE.textInput}
             value={franchise}
-            placeholder="Community name"
+            placeholder="App name"
             onChangeText={(franchise) => this.setState({ franchise })}
           />
 
@@ -135,14 +135,6 @@ class LoginScreen extends React.Component {
                     this.setState({ response, loading: false });
 
                     if (loginToken) {
-                      await global.dispatch({
-                        type: "SET_LOGGED",
-                        value: true,
-                      });
-                      await global.dispatch({
-                        type: "SET_LOGIN_TOKEN",
-                        value: loginToken,
-                      });
                       const host = window.location.host
                         .split(".")
                         .splice(0, 2)

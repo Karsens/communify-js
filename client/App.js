@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Platform, StatusBar, StyleSheet, View } from "react-native";
+import { Platform, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SplashScreen } from "expo";
 import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
@@ -10,6 +10,8 @@ import { PersistGate } from "redux-persist/es/integration/react";
 import { connect, Provider } from "react-redux";
 import { patchFlatListProps } from "react-native-web-refresh-control";
 import { Helmet } from "react-helmet";
+import { Notifications } from "expo";
+import * as Permissions from "expo-permissions";
 
 import useLinking from "./navigation/useLinking";
 import { GlobalContextProvider } from "./GlobalContext";
@@ -20,6 +22,7 @@ import BottomTabNavigator from "./navigation/BottomTabNavigator";
 
 import WebHomeScreen from "./screens/WebHomeScreen";
 import CreatePostScreen from "./screens/CreatePostScreen";
+import CreateFolderItemScreen from "./screens/CreateFolderItemScreen";
 import PostScreen from "./screens/PostScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
@@ -32,6 +35,7 @@ import UpdateFranchiseScreen from "./screens/UpdateFranchiseScreen";
 import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
+import NotFoundScreen from "./screens/NotFoundScreen";
 import Constants from "./Constants";
 
 const Stack = createStackNavigator();
@@ -57,6 +61,7 @@ function App({ global }) {
         await Font.loadAsync({
           ...Ionicons.font,
           "space-mono": require("./assets/fonts/SpaceMono-Regular.ttf"),
+          subway: require("./assets/fonts/Subway-Black.ttf"),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
@@ -74,21 +79,22 @@ function App({ global }) {
     return null;
   } else {
     let sub = undefined;
+    let domain = undefined;
     if (Platform.OS === "web") {
-      const url = window.location.hostname.split("."); //something like tribes.communify.cc
+      const url = window.location.hostname.split("."); //hostname is something like tribes.communify.cc
       const numberForSub = url[1] === "localhost" ? 2 : 3;
       sub = url.length === numberForSub ? url[0] : undefined;
+
+      domain = url.slice(url.length - 2, url.length).join(".");
+      if (domain !== "localhost" && domain !== "communify.cc") {
+        sub = domain;
+      }
     }
 
-    const initialRouteName =
-      Platform.OS === "web"
-        ? sub
-          ? "app"
-          : "home"
-        : global.device.logged
-        ? "app"
-        : "login";
+    const initialRouteName = "app";
 
+    const hostName =
+      Platform.OS === "web" ? window.location.hostname : undefined;
     return (
       <View
         style={{
@@ -116,8 +122,19 @@ function App({ global }) {
         >
           <Stack.Navigator initialRouteName={initialRouteName}>
             {/* home is always available */}
-            <Stack.Screen name="home" component={WebHomeScreen} />
-            <Stack.Screen name="create" component={SignupFranchiseScreen} />
+            {Platform.OS === "web" &&
+            (hostName === "communify.cc" || hostName === "localhost") ? (
+              <>
+                <Stack.Screen name="home" component={WebHomeScreen} />
+                <Stack.Screen name="create" component={SignupFranchiseScreen} />
+              </>
+            ) : null}
+
+            <Stack.Screen
+              name="notFound"
+              options={{ header: () => null }}
+              component={NotFoundScreen}
+            />
 
             {!global.device.logged ? (
               <>
@@ -130,29 +147,35 @@ function App({ global }) {
               </>
             ) : null}
 
-            <Stack.Screen name="app" component={BottomTabNavigator} />
-            <Stack.Screen name="createPost" component={CreatePostScreen} />
-            <Stack.Screen name="post" component={PostScreen} />
+            <>
+              <Stack.Screen name="app" component={BottomTabNavigator} />
+              <Stack.Screen
+                name="createFolderItem"
+                component={CreateFolderItemScreen}
+              />
+              <Stack.Screen name="createPost" component={CreatePostScreen} />
+              <Stack.Screen name="post" component={PostScreen} />
 
-            <Stack.Screen
-              name="adminFranchise"
-              component={AdminFranchiseScreen}
-            />
-            <Stack.Screen name="admin" component={AdminScreen} />
-            <Stack.Screen name="profile" component={ProfileScreen} />
-            <Stack.Screen name="settings" component={SettingsScreen} />
-            <Stack.Screen
-              name="updateProfile"
-              component={UpdateProfileScreen}
-            />
-            <Stack.Screen
-              name="updateFranchise"
-              component={UpdateFranchiseScreen}
-            />
-            <Stack.Screen
-              name="changePassword"
-              component={ChangePasswordScreen}
-            />
+              <Stack.Screen
+                name="adminFranchise"
+                component={AdminFranchiseScreen}
+              />
+              <Stack.Screen name="admin" component={AdminScreen} />
+              <Stack.Screen name="profile" component={ProfileScreen} />
+              <Stack.Screen name="settings" component={SettingsScreen} />
+              <Stack.Screen
+                name="updateProfile"
+                component={UpdateProfileScreen}
+              />
+              <Stack.Screen
+                name="updateFranchise"
+                component={UpdateFranchiseScreen}
+              />
+              <Stack.Screen
+                name="changePassword"
+                component={ChangePasswordScreen}
+              />
+            </>
           </Stack.Navigator>
         </NavigationContainer>
       </View>
@@ -167,12 +190,21 @@ class _RootContainer extends React.Component {
     reloadMe(device.loginToken);
 
     let sub = Constants.FRANCHISE.slug;
+    let domain = undefined;
     if (Platform.OS === "web") {
       const url = window.location.hostname.split("."); //something like tribes.communify.cc
       const numberForSub = url[1] === "localhost" ? 2 : 3;
+
+      domain = url.slice(url.length - (numberForSub - 1), url.length).join("."); //picks the last two or one part of the url; somethign like localhost or communify.cc or muskify.com
+
       sub = url.length === numberForSub ? url[0] : undefined;
+
+      if (domain !== "localhost" && domain !== "communify.cc") {
+        sub = domain;
+      }
     }
 
+    console.log("franchise", sub, domain);
     reloadFranchise(sub);
   }
 

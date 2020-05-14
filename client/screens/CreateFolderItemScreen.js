@@ -1,7 +1,18 @@
 import * as React from "react";
-import { StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  Image,
+  TextInput,
+  Platform,
+  View,
+} from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import ImageInput from "../components/ImageInput";
+import OptionsInput from "../components/OptionsInput";
+import FileInput from "../components/FileInput";
+
 import Button from "../components/Button";
 
 import { withGlobalContext } from "../GlobalContext";
@@ -12,18 +23,17 @@ class UpdateProfileScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    props.navigation.setOptions({ headerTitle: "Update profile" });
+    props.navigation.setOptions({ headerTitle: "Create item" });
 
     this.state = {
-      name: props.global.me?.name,
-      bio: props.global.me?.bio,
-      image: props.global.me?.image,
+      message: "",
+      image: null,
     };
   }
 
   render() {
     const { navigation, global } = this.props;
-    const { image, name, bio, response, hasEdited } = this.state;
+    const { response, hasEdited, name, image, file, type, text } = this.state;
 
     return (
       <View style={styles.container}>
@@ -31,12 +41,31 @@ class UpdateProfileScreen extends React.Component {
           style={styles.container}
           contentContainerStyle={{
             paddingTop: 30,
-            marginHorizontal: 20,
           }}
         >
           <View style={{ height: 40 }}>
             <Text>{response}</Text>
           </View>
+
+          <OptionsInput
+            title="Type"
+            options={[
+              { key: "folder", label: "Folder" },
+              { key: "youtube", label: "Youtube video" },
+              { key: "mp3", label: "MP3" },
+              { key: "image", label: "Image" },
+              { key: "text", label: "Blogpost" },
+            ]}
+            onChange={(type) => this.setState({ type })}
+            value={this.state.type}
+          />
+
+          <TextInput
+            style={[STYLE.textInput]}
+            value={name}
+            placeholder="Name"
+            onChangeText={(name) => this.setState({ name })}
+          />
 
           <ImageInput
             value={image}
@@ -48,26 +77,25 @@ class UpdateProfileScreen extends React.Component {
             }
           />
 
-          <TextInput
-            style={STYLE.textInput}
-            value={name}
-            placeholder="Name"
-            onChangeText={(name) => this.setState({ name })}
+          <FileInput
+            title="Select file(s)"
+            value={file}
+            onChange={(file) => this.setState({ file })}
           />
 
-          <TextInput
-            style={[STYLE.textInput, { height: 200 }]}
-            numberOfLines={4}
-            multiline
-            value={bio}
-            placeholder="Tell something about yourself"
-            onChangeText={(bio) => this.setState({ bio })}
-          />
+          {type === "text" || type === "youtube" ? (
+            <TextInput
+              style={[STYLE.textInput]}
+              value={text}
+              placeholder={type === "text" ? "Blog text" : "Video URL"}
+              onChangeText={(text) => this.setState({ text })}
+            />
+          ) : null}
 
           <Button
-            title="Update"
+            title="Create"
             onPress={() => {
-              const url = `${Constants.SERVER_ADDR}/updateProfile`;
+              const url = `${Constants.SERVER_ADDR}/createFolderItem`;
               fetch(url, {
                 method: "POST",
                 headers: {
@@ -78,13 +106,17 @@ class UpdateProfileScreen extends React.Component {
                   loginToken: global.device.loginToken,
                   image: hasEdited ? image : undefined,
                   name,
-                  bio,
+                  file,
+                  type,
+                  text,
                 }),
               })
                 .then((response) => response.json())
-                .then(({ response, loginToken }) => {
+                .then(({ response, success, pid }) => {
                   this.setState({ response });
-                  global.reloadMe(global.device.loginToken);
+                  if (success) {
+                    navigation.navigate("posts", { reload: pid });
+                  }
                 })
                 .catch((error) => {
                   console.log(error, url);

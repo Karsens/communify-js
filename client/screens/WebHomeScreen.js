@@ -4,6 +4,7 @@ import {
   Platform,
   StyleSheet,
   Text,
+  Dimensions,
   TouchableOpacity,
   Linking,
   FlatList,
@@ -12,9 +13,10 @@ import {
 
 import Button from "../components/Button";
 
-import { ScrollView } from "react-native-gesture-handler";
 import Constants from "../Constants";
 
+import { ScrollView } from "react-native-gesture-handler";
+const { width } = Dimensions.get("window");
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -43,6 +45,8 @@ export default class HomeScreen extends React.Component {
   }
 
   renderItem = ({ item }) => {
+    const colors = ["green", "orange", "lime", "blue", "red"];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
     return (
       <TouchableOpacity
         onPress={() => {
@@ -63,7 +67,18 @@ export default class HomeScreen extends React.Component {
               style={{ width: 100, height: 100, borderRadius: 5 }}
             />
           ) : (
-            <View style={{ width: 100, height: 100 }} />
+            <View
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 5,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: randomColor,
+              }}
+            >
+              <Text style={{ fontSize: 30 }}>{item.name.substring(0, 1)}</Text>
+            </View>
           )}
           <Text>{item.name}</Text>
         </View>
@@ -77,39 +92,65 @@ export default class HomeScreen extends React.Component {
 
     return (
       <View style={styles.container}>
-        <View style={{ flex: 1 }} />
-
-        <Image
-          source={require("../assets/icon.png")}
-          style={{ width: 150, height: 150 }}
-        />
-        <Text
-          style={{ fontSize: 26, fontFamily: "space-mono", fontWeight: "bold" }}
+        <ScrollView
+          contentContainerStyle={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          Bring your community, online courses, and memberships together in one
-          app.
-        </Text>
-
-        <View style={{ flexDirection: "row" }}>
-          <View></View>
-          <Button
-            title="Start free"
-            onPress={() => navigation.navigate("create")}
+          <View style={{ height: 50 }} />
+          <Image
+            source={require("../assets/icon.png")}
+            style={{ width: 150, height: 150 }}
           />
-          <View />
-        </View>
-        <View style={{ margin: 20 }}>
-          <Text>
-            These communities went before you. Click to see them live.
-          </Text>
-        </View>
-        <FlatList
-          data={franchises}
-          style={{ height: 100, flex: 1 }}
-          horizontal
-          renderItem={this.renderItem}
-          keyExtractor={(item, index) => `item${index}`}
-        />
+
+          <View style={{ alignItems: "center", marginVertical: 20 }}>
+            <Text
+              style={{
+                fontSize: 26,
+                fontFamily: "space-mono",
+                fontWeight: "bold",
+                maxWidth: 500,
+                alignSelf: "center",
+                textAlign: "center",
+              }}
+            >
+              Align travel plans & travel together with your tribe
+            </Text>
+
+            <Text
+              style={{
+                maxWidth: 500,
+                alignSelf: "center",
+                textAlign: "center",
+              }}
+            >
+              Make lasting friendships by creating a group of backpackers to
+              travel together with.
+            </Text>
+          </View>
+
+          <View style={{ flexDirection: "row" }}>
+            <View />
+            <Button
+              title="Start free"
+              onPress={() => navigation.navigate("create")}
+            />
+            <View />
+          </View>
+
+          <View style={{ margin: 20 }}>
+            <Text>These tribes went before you.</Text>
+          </View>
+
+          <FlatList
+            data={franchises}
+            style={{ maxWidth: width - 40 }}
+            horizontal
+            renderItem={this.renderItem}
+            keyExtractor={(item, index) => `item${index}`}
+          />
+        </ScrollView>
       </View>
     );
   }
@@ -119,9 +160,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#7394fb",
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
   },
   developmentModeText: {
     marginBottom: 20,

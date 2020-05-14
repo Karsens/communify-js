@@ -1,9 +1,17 @@
 import * as React from "react";
-import { Image, TouchableOpacity, View, Platform } from "react-native";
+import {
+  Image,
+  TouchableOpacity,
+  View,
+  Platform,
+  ActivityIndicator,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import * as ImageManipulator from "expo-image-manipulator";
 import Constants from "../Constants";
+import { Ionicons } from "@expo/vector-icons";
+
 class ImageInput extends React.Component {
   state = { hasEdited: false };
   getPermissionAsync = async () => {
@@ -19,6 +27,8 @@ class ImageInput extends React.Component {
     await this.getPermissionAsync();
 
     try {
+      this.setState({ loading: true });
+
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsEditing: true,
@@ -26,22 +36,31 @@ class ImageInput extends React.Component {
         base64: true,
       });
 
-      const base64 =
-        Platform.OS === "web"
-          ? result.uri
-          : "data:image/png;base64," + result.base64;
-
-      const manipulated = await ImageManipulator.manipulateAsync(
-        base64,
-        [{ resize: { width: 500, height: 500 } }],
-        {
-          format: ImageManipulator.SaveFormat.PNG,
-        }
-      );
-
       if (!result.cancelled) {
-        this.props.onChange(manipulated.base64);
-        this.setState({ hasEdited: true });
+        const base64 =
+          Platform.OS === "web"
+            ? result.uri
+            : "data:image/png;base64," + result.base64;
+
+        const manipulated = await ImageManipulator.manipulateAsync(
+          Platform.OS === "web" ? base64 : result.uri,
+          [{ resize: { width: 500, height: 500 } }],
+          {
+            format: ImageManipulator.SaveFormat.PNG,
+            base64: true,
+          }
+        ).catch((e) => console.log("e", e));
+
+        const manipulatedBase64 =
+          Platform.OS === "web"
+            ? manipulated.base64
+            : "data:image/png;base64," + manipulated.base64;
+
+        this.setState({ loading: false, hasEdited: true }, () => {
+          this.props.onChange(manipulatedBase64);
+        });
+      } else {
+        this.setState({ loading: false });
       }
     } catch (E) {
       console.log(E);
@@ -49,10 +68,9 @@ class ImageInput extends React.Component {
   };
 
   render() {
-    const { hasEdited } = this.state;
+    const { hasEdited, loading } = this.state;
     const { value, small } = this.props;
 
-    console.log("value", value);
     const SIZE = small ? 40 : 200;
     return (
       <View style={{ alignItems: "center", justifyContent: "center" }}>
@@ -72,8 +90,16 @@ class ImageInput extends React.Component {
                 borderColor: "#CCC",
                 width: SIZE,
                 height: SIZE,
+                justifyContent: "center",
+                alignItems: "center",
               }}
-            />
+            >
+              {loading ? (
+                <ActivityIndicator />
+              ) : (
+                <Ionicons name="md-camera" color="#CCC" size={SIZE / 2} />
+              )}
+            </View>
           )}
         </TouchableOpacity>
       </View>

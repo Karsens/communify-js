@@ -1,3 +1,5 @@
+const sgMail = require("@sendgrid/mail");
+
 const forgotPassword = async (req, res, User) => {
   const { email, fid } = req.body;
 
@@ -19,7 +21,7 @@ const forgotPassword = async (req, res, User) => {
 
     //ES6
     sgMail.send(msg).then(() => {
-      res.json({ response: "Check je mail om je wachtwoord te resetten" });
+      res.json({ response: "Check your email to reset your password" });
     }, console.error);
   } else {
     res.json({ response: "Email not found" });
@@ -35,9 +37,9 @@ const forgotPassword2 = async (req, res) => {
   );
 
   if (updated === 1) {
-    res.json({ success: "Wachtwoord gereset" });
+    res.json({ success: "Wachtwoord is changed" });
   } else {
-    res.json({ error: "Email/token niet gevonden" });
+    res.json({ error: "Email/token not found" });
   }
 };
 

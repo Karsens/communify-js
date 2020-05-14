@@ -3,6 +3,7 @@
     "name": "Communify",
     "description": "Stimulate collaboration in coworking spaces",
     "slug": "communify",
+    "owner": "wwoessi",
     "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",

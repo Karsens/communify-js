@@ -14,8 +14,14 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 var cors = require("cors");
 
 const sequelize = new Sequelize({
-  dialect: "sqlite",
-  storage: "database/db3.sqlite",
+  dialect: "mysql",
+  database: process.env.DB_DB,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  dialectOptions: {
+    host: process.env.DB_HOST,
+    port: "3306",
+  },
   logging: null,
 });
 
@@ -54,6 +60,9 @@ Franchise.init(
     slug: DataTypes.STRING,
     image: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
+    bio: DataTypes.STRING,
+    primaryColor: DataTypes.STRING,
+    secondaryColor: DataTypes.STRING,
   },
   {
     sequelize,
@@ -61,66 +70,29 @@ Franchise.init(
   }
 );
 
-//community belongs to franchise
-class Community extends Model {}
+class Tribe extends Model {}
 
-Community.init(
+Tribe.init(
   {
     fid: DataTypes.INTEGER,
     name: DataTypes.STRING,
+    slug: DataTypes.STRING,
     image: DataTypes.STRING,
     thumbnail: DataTypes.STRING,
-    bio: DataTypes.STRING,
+    tagline: DataTypes.STRING,
+    bio: DataTypes.TEXT,
   },
   {
     sequelize,
-    modelName: "community",
-  }
-);
-Community.belongsTo(Franchise, {
-  foreignKey: "fid",
-});
-Franchise.hasMany(Community, {
-  foreignKey: "fid",
-});
-User.belongsTo(Community, {
-  foreignKey: "coid",
-});
-Community.hasMany(User, {
-  foreignKey: "coid",
-});
-User.belongsTo(Franchise, {
-  foreignKey: "fid",
-});
-Franchise.hasMany(User, {
-  foreignKey: "fid",
-});
-
-class CommunitySub extends Model {}
-
-CommunitySub.init(
-  {
-    uid: DataTypes.INTEGER,
-    coid: DataTypes.INTEGER,
-  },
-  {
-    sequelize,
-    modelName: "communitysub",
+    modelName: "tribe",
   }
 );
 
-CommunitySub.belongsTo(User, {
-  foreignKey: "uid",
+Tribe.belongsTo(Franchise, {
+  foreignKey: "fid",
 });
-User.hasMany(CommunitySub, {
-  foreignKey: "uid",
-});
-
-CommunitySub.belongsTo(Community, {
-  foreignKey: "coid",
-});
-Community.hasMany(CommunitySub, {
-  foreignKey: "coid",
+Franchise.hasMany(Tribe, {
+  foreignKey: "fid",
 });
 
 //chat belongs to channel, sub belongs to channel. channel belongs to community
@@ -129,7 +101,7 @@ class Channel extends Model {}
 
 Channel.init(
   {
-    coid: DataTypes.INTEGER,
+    fid: DataTypes.INTEGER,
     name: DataTypes.STRING,
   },
   {
@@ -137,13 +109,6 @@ Channel.init(
     modelName: "channel",
   }
 );
-
-Channel.belongsTo(Community, {
-  foreignKey: "coid",
-});
-Community.hasMany(Channel, {
-  foreignKey: "coid",
-});
 
 class ChannelSub extends Model {}
 
@@ -207,20 +172,13 @@ Post.init(
     fid: DataTypes.INTEGER,
     post: DataTypes.STRING,
     image: DataTypes.STRING,
-    numComments: { type: DataTypes.NUMBER, defaultValue: 0 },
+    numComments: { type: DataTypes.INTEGER, defaultValue: 0 },
   },
   {
     sequelize,
     modelName: "post",
   }
 );
-
-Post.belongsTo(Franchise, {
-  foreignKey: "fid",
-});
-Franchise.hasMany(Post, {
-  foreignKey: "fid",
-});
 
 Post.belongsTo(User, {
   foreignKey: "uid",
@@ -276,13 +234,6 @@ Group.init(
   }
 );
 
-Group.belongsTo(Community, {
-  foreignKey: "coid",
-});
-Community.hasMany(Group, {
-  foreignKey: "coid",
-});
-
 class GroupSub extends Model {}
 
 GroupSub.init(
@@ -310,8 +261,38 @@ Group.hasMany(GroupSub, {
   foreignKey: "gid",
 });
 
+class Folder extends Model {}
+
+Folder.init(
+  {
+    fid: DataTypes.INTEGER,
+    parentId: DataTypes.INTEGER,
+    name: DataTypes.STRING,
+    image: DataTypes.STRING,
+    file: DataTypes.STRING,
+    /**
+     * file can be image and then it needs a thumbnail
+     */
+    thumbnail: DataTypes.STRING,
+    type: DataTypes.STRING,
+    /**
+     * type can be text and then it needs a text, or if type is youtube, then text is the youtube url
+     */
+    text: DataTypes.STRING,
+  },
+  {
+    sequelize,
+    modelName: "folder",
+  }
+);
+
 try {
-  sequelize.sync({ alter: true });
+  sequelize
+    .sync({ alter: true }) //{ alter: true }
+    .then(() => {
+      console.log("synced");
+    })
+    .catch((e) => console.log(e));
 } catch (e) {
   console.log("e", e);
 }
@@ -439,6 +420,23 @@ server.post("/post", (req, res) =>
 
 server.post("/deletePost", (req, res) =>
   require("./deletePost").deletePost(req, res, User, Franchise, Post, Comment)
+);
+
+/**
+ * folders
+ */
+
+server.get("/folder", (req, res) =>
+  require("./folder").folder(req, res, User, Franchise, Folder)
+);
+server.post("/createFolderItem", (req, res) =>
+  require("./createFolderItem").createFolderItem(
+    req,
+    res,
+    User,
+    Franchise,
+    Folder
+  )
 );
 
 const port = process.env.PORT || 4003;

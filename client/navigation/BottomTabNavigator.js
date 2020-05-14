@@ -2,10 +2,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import * as React from "react";
 
 import TabBarIcon from "../components/TabBarIcon";
-import HomeScreen from "../screens/HomeScreen";
+import TribesScreen from "../screens/TribesScreen";
 import LinksScreen from "../screens/LinksScreen";
 import ChatScreen from "../screens/ChatScreen";
-import MembersScreen from "../screens/MembersScreen";
+import ActivitiesScreen from "../screens/ActivitiesScreen";
+import TribeScreen from "../screens/TribeScreen";
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = "home";
@@ -19,15 +20,27 @@ export default function BottomTabNavigator({ navigation, route }) {
   return (
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
       <BottomTab.Screen
-        name="posts"
-        component={HomeScreen}
+        name="tribes"
+        component={TribesScreen}
         options={{
-          title: "Home",
+          title: "Tribes",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="ios-home" />
+            <TabBarIcon focused={focused} name="ios-people" />
           ),
         }}
       />
+
+      <BottomTab.Screen
+        name="tribe"
+        component={TribeScreen}
+        options={{
+          title: "My Tribe",
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon focused={focused} name="ios-bonfire" />
+          ),
+        }}
+      />
+
       <BottomTab.Screen
         name="chat"
         component={ChatScreen}
@@ -40,12 +53,12 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
 
       <BottomTab.Screen
-        name="members"
-        component={MembersScreen}
+        name="activities"
+        component={ActivitiesScreen}
         options={{
-          title: "Members",
+          title: "Activities",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="ios-contacts" />
+            <TabBarIcon focused={focused} name="ios-calendar" />
           ),
         }}
       />
@@ -77,5 +90,7 @@ function getHeaderTitle(route) {
       return "Members";
     case "links":
       return "More";
+    case "resources":
+      return "Explore";
   }
 }

@@ -14,7 +14,6 @@ class LoginScreen extends React.Component {
   };
   constructor(props) {
     super(props);
-
     props.navigation.setOptions({ headerTitle: global.franchise?.name });
   }
 

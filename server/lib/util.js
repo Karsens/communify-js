@@ -61,4 +61,35 @@ const saveImageIfValid = (res, base64, thumbnail) => {
   }
 };
 
-module.exports = { publicUserFields, isEmail, saveImageIfValid };
+const fileExtensions = ["mp3"];
+const saveFileIfValid = (res, base64) => {
+  if (!base64) {
+    return {};
+  }
+
+  const mimeInfo = fileType(Buffer.from(base64Data, "base64"));
+
+  if (!mimeInfo || !fileExtensions.includes(mimeInfo.ext)) {
+    res.json({ response: "Invalid file" });
+    return { invalid: true };
+  }
+
+  // to declare some path to store your converted image
+  const path = `./uploads/${Date.now()}.${mimeInfo.ext}`;
+
+  // to convert base64 format into random filename
+  const base64Data = base64.replace(/^data:([A-Za-z-+/]+);base64,/, "");
+
+  fs.writeFileSync(path, base64Data, { encoding: "base64" });
+
+  return {
+    pathFile: path.substring(1),
+  };
+};
+
+module.exports = {
+  publicUserFields,
+  isEmail,
+  saveImageIfValid,
+  saveFileIfValid,
+};

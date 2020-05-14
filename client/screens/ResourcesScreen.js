@@ -12,44 +12,44 @@ import {
 } from "react-native";
 import { RefreshControl } from "react-native-web-refresh-control";
 import moment from "moment";
+import { Ionicons } from "@expo/vector-icons";
+
 const { width } = Dimensions.get("window");
 const isBigDevice = width > 500;
 
 import Button from "../components/Button";
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
-class PostsScreen extends React.Component {
+class ResourcesScreen extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      posts: [],
+      folder: [],
       isFetching: false,
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
-      this.onRefresh();
-    }
-  }
-
   componentDidMount() {
-    this.fetchPosts();
+    this.fetchFolder();
   }
 
-  fetchPosts = () => {
+  fetchFolder = () => {
+    const parentId = this.props.route?.params?.parentId;
     const { global } = this.props;
-    fetch(`${Constants.SERVER_ADDR}/posts?fid=${global.franchise?.id}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
+    fetch(
+      `${Constants.SERVER_ADDR}/folder?fid=${global.franchise?.id}&parentId=${parentId}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => response.json())
-      .then((posts) => {
-        this.setState({ posts, isFetching: false });
+      .then((folder) => {
+        this.setState({ folder, isFetching: false });
       })
       .catch((error) => {
         console.error(error);
@@ -58,7 +58,7 @@ class PostsScreen extends React.Component {
 
   onRefresh = () => {
     this.setState({ isFetching: true }, function () {
-      this.fetchPosts();
+      this.fetchFolder();
     });
   };
 
@@ -77,44 +77,27 @@ class PostsScreen extends React.Component {
       >
         <TouchableOpacity
           onPress={() =>
-            navigation.navigate("profile", { username: item.user.username })
+            navigation.navigate("resources", { parentId: item.id })
           }
         >
           <View
             style={{
-              flexDirection: "row",
               alignItems: "center",
               paddingHorizontal: 5,
             }}
           >
-            <Image
-              source={{ uri: Constants.SERVER_ADDR + item.user.thumbnail }}
-              style={{ width: 40, height: 40, borderRadius: 20 }}
-            />
-            <View style={{ marginLeft: 10 }}>
-              <Text>{item.user.username}</Text>
-              <Text>{moment(item.createdAt).format("DD-MM-YYYY HH:mm")}</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
+            {item.image ? (
+              <Image
+                source={{
+                  uri: Constants.SERVER_ADDR + item.image,
+                }}
+                style={{ width: 40, height: 40 }}
+              />
+            ) : (
+              <Ionicons name="md-folder" size={40} />
+            )}
 
-        <View style={{ marginHorizontal: 5, marginVertical: 10 }}>
-          <Text>{item?.post}</Text>
-        </View>
-        {item.image ? (
-          <Image
-            source={{
-              uri: Constants.SERVER_ADDR + item.image,
-            }}
-            style={{ width: maxWidth, height: maxWidth }}
-          />
-        ) : null}
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate("post", { pid: item.id })}
-        >
-          <View>
-            <Text>Comments: {item.numComments}</Text>
+            <Text>{item.name}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -123,16 +106,18 @@ class PostsScreen extends React.Component {
 
   render() {
     const { posts } = this.state;
-    const { navigation } = this.props;
+    const { navigation, global } = this.props;
     return (
       <View style={styles.container}>
         <FlatList
-          ListHeaderComponent={() => (
-            <Button
-              title="Create new post"
-              onPress={() => navigation.navigate("createPost")}
-            />
-          )}
+          ListHeaderComponent={() =>
+            global.me?.level >= 5 || __DEV__ ? (
+              <Button
+                title="Create new"
+                onPress={() => navigation.navigate("createFolderItem")}
+              />
+            ) : null
+          }
           data={posts}
           renderItem={this.renderItem}
           keyExtractor={(item, index) => index.toString()}
@@ -156,4 +141,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withGlobalContext(PostsScreen);
+export default withGlobalContext(ResourcesScreen);

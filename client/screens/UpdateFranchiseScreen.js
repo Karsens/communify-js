@@ -1,5 +1,5 @@
 import * as React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, TextInput } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 import { withGlobalContext } from "../GlobalContext";
@@ -7,6 +7,7 @@ import { withGlobalContext } from "../GlobalContext";
 import Button from "../components/Button";
 import Constants from "../Constants";
 import ImageInput from "../components/ImageInput";
+import STYLE from "../Style";
 
 class LoginScreen extends React.Component {
   constructor(props) {
@@ -16,13 +17,24 @@ class LoginScreen extends React.Component {
 
     this.state = {
       image: props.global.franchise?.image,
+      primaryColor: props.global.franchise?.primaryColor,
+      secondaryColor: props.global.franchise?.secondaryColor,
+      bio: props.global.franchise?.bio,
       hasEdited: false,
     };
   }
 
   render() {
     const { navigation, global } = this.props;
-    const { response, loading, image, hasEdited } = this.state;
+    const {
+      response,
+      loading,
+      image,
+      bio,
+      primaryColor,
+      secondaryColor,
+      hasEdited,
+    } = this.state;
 
     return (
       <View style={styles.container}>
@@ -47,6 +59,27 @@ class LoginScreen extends React.Component {
             }
           />
 
+          <TextInput
+            style={STYLE.textInput}
+            value={primaryColor}
+            placeholder="Primary color"
+            onChangeText={(text) => this.setState({ primaryColor: text })}
+          />
+
+          <TextInput
+            style={STYLE.textInput}
+            value={bio}
+            placeholder="Describe your community"
+            onChangeText={(text) => this.setState({ bio: text })}
+          />
+
+          <TextInput
+            style={STYLE.textInput}
+            value={secondaryColor}
+            placeholder="Secondary color"
+            onChangeText={(text) => this.setState({ secondaryColor: text })}
+          />
+
           <Button
             loading={loading}
             title="Update"
@@ -60,7 +93,10 @@ class LoginScreen extends React.Component {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                  image,
+                  image: hasEdited ? image : undefined,
+                  primaryColor,
+                  secondaryColor,
+                  bio,
                   loginToken: global.device?.loginToken,
                 }),
               })

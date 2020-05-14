@@ -1,7 +1,14 @@
 const { saveImageIfValid } = require("./util");
 
 const update = async (req, res, User, Franchise) => {
-  const { loginToken, name, image, bio } = req.body;
+  const {
+    loginToken,
+    name,
+    image,
+    bio,
+    primaryColor,
+    secondaryColor,
+  } = req.body;
 
   if (!loginToken) {
     res.json({ response: "Geen token" });
@@ -27,6 +34,18 @@ const update = async (req, res, User, Franchise) => {
   if (pathImage && pathThumbnail) {
     update.image = pathImage;
     update.thumbnail = pathThumbnail;
+  }
+
+  if (bio) {
+    update.bio = bio;
+  }
+
+  if (primaryColor) {
+    update.primaryColor = primaryColor;
+  }
+
+  if (secondaryColor) {
+    update.secondaryColor = secondaryColor;
   }
 
   await Franchise.update(update, { where: { id: user.fid } });
