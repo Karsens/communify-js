@@ -34,8 +34,10 @@
     },
     "extra": {
       "franchise": {
-        "slug": "tribes"
-      }
+        "slug": "backpackingtribe"
+      },
+      "title": "Align destinations & travel together with your tribe",
+      "subtitle": "Make lasting friendships by creating a group of backpackers to travel together with"
     }
   }
 }

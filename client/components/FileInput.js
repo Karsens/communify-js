@@ -20,7 +20,6 @@ class FileInput extends React.Component {
 
       let result = await DocumentPicker.getDocumentAsync({ multiple: false });
 
-      console.log("reulst", result);
       if (!result.type === "cancel") {
         this.setState({ loading: false, hasEdited: true }, () => {
           this.props.onChange(result.uri);

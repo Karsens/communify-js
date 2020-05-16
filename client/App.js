@@ -1,17 +1,15 @@
 import * as React from "react";
-import { Platform, StatusBar, StyleSheet, Text, View } from "react-native";
+import { Platform, StatusBar, UIManager, View } from "react-native";
 import { SplashScreen } from "expo";
 import * as Font from "expo-font";
+import ExpoConstants from "expo-constants";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { PersistGate } from "redux-persist/es/integration/react";
 import { connect, Provider } from "react-redux";
-import { patchFlatListProps } from "react-native-web-refresh-control";
 import { Helmet } from "react-helmet";
-import { Notifications } from "expo";
-import * as Permissions from "expo-permissions";
 
 import useLinking from "./navigation/useLinking";
 import { GlobalContextProvider } from "./GlobalContext";
@@ -19,9 +17,10 @@ import ErrorBoundary from "./ErrorBoundary";
 import { persistor, store } from "./Store";
 
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
+import Constants from "./Constants";
 
-import WebHomeScreen from "./screens/WebHomeScreen";
 import CreatePostScreen from "./screens/CreatePostScreen";
+import CreateTribeScreen from "./screens/CreateTribeScreen";
 import CreateFolderItemScreen from "./screens/CreateFolderItemScreen";
 import PostScreen from "./screens/PostScreen";
 import LoginScreen from "./screens/LoginScreen";
@@ -36,10 +35,16 @@ import ChangePasswordScreen from "./screens/ChangePasswordScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import NotFoundScreen from "./screens/NotFoundScreen";
-import Constants from "./Constants";
+import TribeScreen from "./screens/TribeScreen";
+import ChatScreen from "./screens/ChatScreen";
 
 const Stack = createStackNavigator();
 
+if (Platform.OS === "android") {
+  if (UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+  }
+}
 // patchFlatListProps();
 
 function App({ global }) {
@@ -78,23 +83,8 @@ function App({ global }) {
   if (!isLoadingComplete) {
     return null;
   } else {
-    let sub = undefined;
-    let domain = undefined;
-    if (Platform.OS === "web") {
-      const url = window.location.hostname.split("."); //hostname is something like tribes.communify.cc
-      const numberForSub = url[1] === "localhost" ? 2 : 3;
-      sub = url.length === numberForSub ? url[0] : undefined;
-
-      domain = url.slice(url.length - 2, url.length).join(".");
-      if (domain !== "localhost" && domain !== "communify.cc") {
-        sub = domain;
-      }
-    }
-
     const initialRouteName = "app";
 
-    const hostName =
-      Platform.OS === "web" ? window.location.hostname : undefined;
     return (
       <View
         style={{
@@ -104,15 +94,8 @@ function App({ global }) {
       >
         {Platform.OS === "web" ? (
           <Helmet>
-            <title>{global.franchise?.name || "Communify"}</title>
-            <meta
-              name="description"
-              content={
-                global.franchise?.name
-                  ? `A community for ${global.franchise?.name}`
-                  : "Communify is a community platform"
-              }
-            />
+            <title>{global.franchise?.name}</title>
+            <meta name="description" content={global.franchise?.description} />
           </Helmet>
         ) : null}
         {Platform.OS === "ios" && <StatusBar barStyle="default" />}
@@ -122,13 +105,7 @@ function App({ global }) {
         >
           <Stack.Navigator initialRouteName={initialRouteName}>
             {/* home is always available */}
-            {Platform.OS === "web" &&
-            (hostName === "communify.cc" || hostName === "localhost") ? (
-              <>
-                <Stack.Screen name="home" component={WebHomeScreen} />
-                <Stack.Screen name="create" component={SignupFranchiseScreen} />
-              </>
-            ) : null}
+            <Stack.Screen name="create" component={SignupFranchiseScreen} />
 
             <Stack.Screen
               name="notFound"
@@ -148,7 +125,14 @@ function App({ global }) {
             ) : null}
 
             <>
-              <Stack.Screen name="app" component={BottomTabNavigator} />
+              <Stack.Screen
+                name="app"
+                component={BottomTabNavigator}
+                options={{ title: "Home", header: () => null }}
+              />
+
+              <Stack.Screen name="createTribe" component={CreateTribeScreen} />
+
               <Stack.Screen
                 name="createFolderItem"
                 component={CreateFolderItemScreen}
@@ -162,6 +146,7 @@ function App({ global }) {
               />
               <Stack.Screen name="admin" component={AdminScreen} />
               <Stack.Screen name="profile" component={ProfileScreen} />
+              <Stack.Screen name="tribe" component={TribeScreen} />
               <Stack.Screen name="settings" component={SettingsScreen} />
               <Stack.Screen
                 name="updateProfile"
@@ -189,23 +174,19 @@ class _RootContainer extends React.Component {
 
     reloadMe(device.loginToken);
 
-    let sub = Constants.FRANCHISE.slug;
+    let slug = ExpoConstants.manifest.extra.franchise.slug;
     let domain = undefined;
     if (Platform.OS === "web") {
-      const url = window.location.hostname.split("."); //something like tribes.communify.cc
-      const numberForSub = url[1] === "localhost" ? 2 : 3;
+      const hostname = window.location.hostname.split(".");
 
-      domain = url.slice(url.length - (numberForSub - 1), url.length).join("."); //picks the last two or one part of the url; somethign like localhost or communify.cc or muskify.com
-
-      sub = url.length === numberForSub ? url[0] : undefined;
-
-      if (domain !== "localhost" && domain !== "communify.cc") {
-        sub = domain;
+      if (hostname[0] !== "localhost") {
+        slug = hostname[0];
       }
     }
 
-    console.log("franchise", sub, domain);
-    reloadFranchise(sub);
+    console.log("slug", slug);
+
+    reloadFranchise(slug);
   }
 
   componentDidUpdate(prevProps) {

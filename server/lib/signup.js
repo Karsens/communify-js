@@ -13,9 +13,11 @@ const signup = async (req, res, User, Franchise) => {
   }
 
   if (!isEmail(email)) {
+    console.log("email", email, "is not email");
     res.json({ response: "Incorrect email" });
     return;
   }
+
   if (!password || password.length < 6) {
     res.json({ response: "Password requires a minimum of 6 letters" });
     return;

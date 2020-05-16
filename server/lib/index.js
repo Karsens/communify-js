@@ -95,6 +95,34 @@ Franchise.hasMany(Tribe, {
   foreignKey: "fid",
 });
 
+class TribeSub extends Model {}
+
+TribeSub.init(
+  {
+    uid: DataTypes.INTEGER,
+    tid: DataTypes.INTEGER,
+    level: DataTypes.INTEGER,
+  },
+  {
+    sequelize,
+    modelName: "tribesub",
+  }
+);
+
+TribeSub.belongsTo(Tribe, {
+  foreignKey: "tid",
+});
+Tribe.hasMany(TribeSub, {
+  foreignKey: "tid",
+});
+
+TribeSub.belongsTo(User, {
+  foreignKey: "uid",
+});
+User.hasMany(TribeSub, {
+  foreignKey: "uid",
+});
+
 //chat belongs to channel, sub belongs to channel. channel belongs to community
 
 class Channel extends Model {}
@@ -102,6 +130,7 @@ class Channel extends Model {}
 Channel.init(
   {
     fid: DataTypes.INTEGER,
+    tid: DataTypes.INTEGER,
     name: DataTypes.STRING,
   },
   {
@@ -116,6 +145,8 @@ ChannelSub.init(
   {
     uid: DataTypes.INTEGER,
     cid: DataTypes.INTEGER,
+    unread: DataTypes.INTEGER,
+    lastmessage: DataTypes.STRING,
   },
   {
     sequelize,
@@ -143,6 +174,7 @@ Chat.init(
     uid: DataTypes.INTEGER,
     cid: DataTypes.INTEGER,
     message: DataTypes.STRING,
+    image: DataTypes.STRING,
   },
   {
     sequelize,
@@ -344,7 +376,9 @@ server.get("/members", (req, res) =>
   require("./members").members(req, res, User)
 );
 
-server.get("/me", (req, res) => require("./me").me(req, res, User));
+server.get("/me", (req, res) =>
+  require("./me").me(req, res, User, TribeSub, Tribe)
+);
 
 server.post("/forgotPassword", (req, res) =>
   require("./forgotPassword").forgotPassword(req, res, User)
@@ -400,6 +434,32 @@ server.post("/deleteFranchise", (req, res) =>
 );
 
 /**
+ * Tribes
+ */
+
+server.post("/createTribe", (req, res) =>
+  require("./createTribe").createTribe(req, res, User, Tribe, Channel)
+);
+
+server.get("/tribes", (req, res) =>
+  require("./tribes").tribes(req, res, User, Tribe)
+);
+
+server.get("/tribe", (req, res) =>
+  require("./tribe").tribe(req, res, User, Tribe)
+);
+
+server.post("/joinTribe", (req, res) =>
+  require("./joinTribe").joinTribe(req, res, {
+    User,
+    Tribe,
+    TribeSub,
+    Channel,
+    ChannelSub,
+  })
+);
+
+/**
  * Posts
  */
 server.get("/posts", (req, res) =>
@@ -438,6 +498,24 @@ server.post("/createFolderItem", (req, res) =>
     Folder
   )
 );
+
+/**
+ * channels
+ */
+
+server.get("/channelsubs", (req, res) =>
+  require("./channelsubs").channelsubs(req, res, User, ChannelSub, Channel)
+);
+
+server
+  .get("/chat", (req, res) =>
+    require("./chat").getChat(req, res, { User, Chat, ChannelSub })
+  )
+  .post("/chat", (req, res) =>
+    require("./chat").postChat(req, res, { User, Chat, ChannelSub, sequelize })
+  );
+
+// create server
 
 const port = process.env.PORT || 4003;
 

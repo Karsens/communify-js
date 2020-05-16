@@ -9,15 +9,22 @@ import {
   Dimensions,
   TouchableOpacity,
   View,
+  SafeAreaView,
 } from "react-native";
+import ExpoConstants from "expo-constants";
+import TouchableScale from "react-native-touchable-scale";
+
 import { RefreshControl } from "react-native-web-refresh-control";
-import moment from "moment";
+
 const { width } = Dimensions.get("window");
 const isBigDevice = width > 500;
+const maxWidth = width > 400 ? 400 : width - 20;
 
 import Button from "../components/Button";
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
+import TabInput from "../components/TabInput";
+
 class TribesScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -25,28 +32,33 @@ class TribesScreen extends React.Component {
     this.state = {
       tribes: [],
       isFetching: false,
+      sort: "popular",
     };
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
-      this.onRefresh();
-    }
   }
 
   componentDidMount() {
     this.fetchTribes();
   }
 
+  // componentDidUpdate(prevProps) {
+  //   if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
+  //     this.onRefresh();
+  //   }
+  // }
+
   fetchTribes = () => {
     const { global } = this.props;
-    fetch(`${Constants.SERVER_ADDR}/posts?fid=${global.franchise?.id}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    })
+    const { sort } = this.state;
+    fetch(
+      `${Constants.SERVER_ADDR}/tribes?fid=${global.franchise?.id}&sort=${sort}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((response) => response.json())
       .then((tribes) => {
         this.setState({ tribes, isFetching: false });
@@ -58,66 +70,63 @@ class TribesScreen extends React.Component {
 
   onRefresh = () => {
     this.setState({ isFetching: true }, function () {
-      this.fetchPosts();
+      this.fetchTribes();
     });
   };
 
   renderItem = ({ item, index }) => {
     const { navigation } = this.props;
 
-    const maxWidth = width > 500 ? 500 : width;
     return (
-      <View
-        style={{
-          marginVertical: 5,
-          paddingVertical: 5,
-
-          backgroundColor: "#FFF",
-        }}
+      <TouchableScale
+        activeScale={0.93}
+        onPress={() => navigation.navigate("tribe", { slug: item.slug })}
+        tension={10}
       >
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("profile", { username: item.user.username })
-          }
+        <View
+          style={{
+            marginVertical: 10,
+            marginHorizontal: 10,
+            borderRadius: 20,
+          }}
         >
+          {item.image ? (
+            <Image
+              source={{
+                uri: Constants.SERVER_ADDR + item.image,
+              }}
+              style={{
+                width: maxWidth,
+                height: maxWidth,
+                borderRadius: 10,
+              }}
+              resizeMode="contain"
+            />
+          ) : null}
+
           <View
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingHorizontal: 5,
+              position: "absolute",
+              left: 20,
+              top: 10,
+              width: width - 100,
             }}
           >
-            <Image
-              source={{ uri: Constants.SERVER_ADDR + item.user.thumbnail }}
-              style={{ width: 40, height: 40, borderRadius: 20 }}
-            />
-            <View style={{ marginLeft: 10 }}>
-              <Text>{item.user.username}</Text>
-              <Text>{moment(item.createdAt).format("DD-MM-YYYY HH:mm")}</Text>
+            <View style={{ marginHorizontal: 5, marginVertical: 10 }}>
+              <Text
+                style={{ fontWeight: "bold", color: "white", fontSize: 26 }}
+              >
+                {item?.name}
+              </Text>
+            </View>
+            <View style={{ marginHorizontal: 5, marginVertical: 10, flex: 1 }}>
+              <Text style={{ color: "white" }} numberOfLines={3}>
+                {item?.tagline}
+              </Text>
             </View>
           </View>
-        </TouchableOpacity>
-
-        <View style={{ marginHorizontal: 5, marginVertical: 10 }}>
-          <Text>{item?.post}</Text>
         </View>
-        {item.image ? (
-          <Image
-            source={{
-              uri: Constants.SERVER_ADDR + item.image,
-            }}
-            style={{ width: maxWidth, height: maxWidth }}
-          />
-        ) : null}
-
-        <TouchableOpacity
-          onPress={() => navigation.navigate("post", { pid: item.id })}
-        >
-          <View>
-            <Text>Comments: {item.numComments}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      </TouchableScale>
     );
   };
 
@@ -134,7 +143,7 @@ class TribesScreen extends React.Component {
             textAlign: "center",
           }}
         >
-          Align destinations & travel together with your tribe
+          {ExpoConstants.manifest.extra.title}
         </Text>
 
         <Text
@@ -144,38 +153,55 @@ class TribesScreen extends React.Component {
             textAlign: "center",
           }}
         >
-          Make lasting friendships by creating a group of backpackers to travel
-          together with.
+          {ExpoConstants.manifest.extra.subtitle}
         </Text>
       </View>
     );
   };
 
+  renderFilter = () => {
+    return (
+      <TabInput
+        tabs={["Popular", "Nearby"]}
+        keys={["popular", "nearby"]}
+        onChange={(sort) => this.setState({ sort })}
+        selected={this.state.sort}
+        selectedColor={"#404040"}
+      />
+    );
+  };
+
+  renderFooter = () => {
+    const { navigation } = this.props;
+
+    return (
+      <View style={{ alignItems: "center" }}>
+        <Text>Can't find what you're looking for?</Text>
+        <Button
+          title="Start a new tribe"
+          onPress={() => navigation.navigate("createTribe")}
+        />
+      </View>
+    );
+  };
+
   render() {
-    const { posts } = this.state;
+    const { tribes } = this.state;
     const { navigation, global } = this.props;
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <FlatList
+          numColumns={Math.floor(width / maxWidth)}
           ListHeaderComponent={() => {
             return (
               <View>
                 {this.renderHeader()}
-                {global.device?.logged ? (
-                  <Button
-                    title="Create new post"
-                    onPress={() => navigation.navigate("createPost")}
-                  />
-                ) : (
-                  <Button
-                    title="Click here to login"
-                    onPress={() => navigation.navigate("login")}
-                  />
-                )}
+                {this.renderFilter()}
               </View>
             );
           }}
-          data={posts}
+          ListFooterComponent={this.renderFooter}
+          data={tribes}
           renderItem={this.renderItem}
           keyExtractor={(item, index) => index.toString()}
           refreshControl={
@@ -185,7 +211,7 @@ class TribesScreen extends React.Component {
             />
           }
         />
-      </View>
+      </SafeAreaView>
     );
   }
 }
@@ -193,8 +219,9 @@ class TribesScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#DDD",
+    backgroundColor: "#FFF",
     paddingHorizontal: isBigDevice ? "20%" : 0,
+    alignItems: "center",
   },
 });
 

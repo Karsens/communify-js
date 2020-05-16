@@ -1,15 +1,31 @@
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import * as React from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createStackNavigator } from "@react-navigation/stack";
 
 import TabBarIcon from "../components/TabBarIcon";
 import TribesScreen from "../screens/TribesScreen";
 import LinksScreen from "../screens/LinksScreen";
+import ChatsScreen from "../screens/ChatsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import ActivitiesScreen from "../screens/ActivitiesScreen";
 import TribeScreen from "../screens/TribeScreen";
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = "home";
+
+const Stack = createStackNavigator();
+function ChatStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        options={{ title: "Chats" }}
+        name="chats"
+        component={ChatsScreen}
+      />
+      <Stack.Screen name="chat" component={ChatScreen} />
+    </Stack.Navigator>
+  );
+}
 
 export default function BottomTabNavigator({ navigation, route }) {
   // Set the header title on the parent stack navigator depending on the
@@ -23,6 +39,7 @@ export default function BottomTabNavigator({ navigation, route }) {
         name="tribes"
         component={TribesScreen}
         options={{
+          headerTitle: () => null,
           title: "Tribes",
           tabBarIcon: ({ focused }) => (
             <TabBarIcon focused={focused} name="ios-people" />
@@ -31,7 +48,7 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
 
       <BottomTab.Screen
-        name="tribe"
+        name="mytribe"
         component={TribeScreen}
         options={{
           title: "My Tribe",
@@ -42,8 +59,8 @@ export default function BottomTabNavigator({ navigation, route }) {
       />
 
       <BottomTab.Screen
-        name="chat"
-        component={ChatScreen}
+        name="chats"
+        component={ChatStack}
         options={{
           title: "Chat",
           tabBarIcon: ({ focused }) => (

@@ -17,53 +17,60 @@ class ImageInput extends React.Component {
   getPermissionAsync = async () => {
     if (Platform.OS === "ios") {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+      console.log("granted", status);
+
       if (status !== "granted") {
         alert("Sorry, we need camera roll permissions to make this work!");
+        return false;
       }
+      return true;
     }
   };
 
   _pickImage = async () => {
-    await this.getPermissionAsync();
+    const hasPermission = await this.getPermissionAsync();
 
-    try {
-      this.setState({ loading: true });
+    if (hasPermission) {
+      try {
+        this.setState({ loading: true });
 
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.All,
-        allowsEditing: true,
-        aspect: [1, 1],
-        base64: true,
-      });
-
-      if (!result.cancelled) {
-        const base64 =
-          Platform.OS === "web"
-            ? result.uri
-            : "data:image/png;base64," + result.base64;
-
-        const manipulated = await ImageManipulator.manipulateAsync(
-          Platform.OS === "web" ? base64 : result.uri,
-          [{ resize: { width: 500, height: 500 } }],
-          {
-            format: ImageManipulator.SaveFormat.PNG,
-            base64: true,
-          }
-        ).catch((e) => console.log("e", e));
-
-        const manipulatedBase64 =
-          Platform.OS === "web"
-            ? manipulated.base64
-            : "data:image/png;base64," + manipulated.base64;
-
-        this.setState({ loading: false, hasEdited: true }, () => {
-          this.props.onChange(manipulatedBase64);
+        let result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          allowsEditing: true,
+          aspect: [1, 1],
+          base64: true,
         });
-      } else {
-        this.setState({ loading: false });
+
+        if (!result.cancelled) {
+          const base64 =
+            Platform.OS === "web"
+              ? result.uri
+              : "data:image/png;base64," + result.base64;
+
+          const manipulated = await ImageManipulator.manipulateAsync(
+            Platform.OS === "web" ? base64 : result.uri,
+            [{ resize: { width: 500, height: 500 } }],
+            {
+              format: ImageManipulator.SaveFormat.PNG,
+              base64: true,
+            }
+          ).catch((e) => console.log("e", e));
+
+          const manipulatedBase64 =
+            Platform.OS === "web"
+              ? manipulated.base64
+              : "data:image/png;base64," + manipulated.base64;
+
+          this.setState({ loading: false, hasEdited: true }, () => {
+            this.props.onChange(manipulatedBase64);
+          });
+        } else {
+          this.setState({ loading: false });
+        }
+      } catch (E) {
+        console.log(E);
       }
-    } catch (E) {
-      console.log(E);
     }
   };
 
