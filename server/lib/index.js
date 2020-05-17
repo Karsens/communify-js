@@ -81,6 +81,8 @@ Tribe.init(
     thumbnail: DataTypes.STRING,
     tagline: DataTypes.STRING,
     bio: DataTypes.TEXT,
+    code: DataTypes.STRING,
+    open: DataTypes.BOOLEAN,
   },
   {
     sequelize,
@@ -145,7 +147,7 @@ ChannelSub.init(
   {
     uid: DataTypes.INTEGER,
     cid: DataTypes.INTEGER,
-    unread: DataTypes.INTEGER,
+    unread: { type: DataTypes.INTEGER, defaultValue: 0 },
     lastmessage: DataTypes.STRING,
   },
   {
@@ -195,57 +197,82 @@ Channel.hasMany(Chat, {
   foreignKey: "cid",
 });
 
-// Comments belong to posts
-class Post extends Model {}
+class Event extends Model {}
 
-Post.init(
+Event.init(
   {
     uid: DataTypes.INTEGER,
     fid: DataTypes.INTEGER,
-    post: DataTypes.STRING,
+    title: DataTypes.STRING,
+    message: DataTypes.STRING,
     image: DataTypes.STRING,
-    numComments: { type: DataTypes.INTEGER, defaultValue: 0 },
+    date: DataTypes.DATE,
   },
   {
     sequelize,
-    modelName: "post",
+    modelName: "event",
   }
 );
 
-Post.belongsTo(User, {
+Event.belongsTo(User, {
   foreignKey: "uid",
 });
-User.hasMany(Post, {
+User.hasMany(Event, {
   foreignKey: "uid",
 });
 
-class Comment extends Model {}
+class EventSub extends Model {}
 
-Comment.init(
+EventSub.init(
   {
     uid: DataTypes.INTEGER,
-    pid: DataTypes.INTEGER,
-    comment: DataTypes.STRING,
-    image: DataTypes.STRING,
+    eventId: DataTypes.INTEGER,
   },
   {
     sequelize,
-    modelName: "comment",
+    modelName: "eventsub",
   }
 );
 
-Comment.belongsTo(User, {
+EventSub.belongsTo(Event, {
+  foreignKey: "eventId",
+});
+Event.hasMany(EventSub, {
+  foreignKey: "eventId",
+});
+
+EventSub.belongsTo(User, {
   foreignKey: "uid",
 });
-User.hasMany(Comment, {
+User.hasMany(EventSub, {
   foreignKey: "uid",
 });
 
-Comment.belongsTo(Post, {
-  foreignKey: "pid",
+class Destination extends Model {}
+
+Destination.init(
+  {
+    fid: DataTypes.INTEGER,
+    tid: DataTypes.INTEGER,
+    title: DataTypes.STRING,
+    city: DataTypes.STRING,
+    country: DataTypes.STRING,
+    lat: DataTypes.FLOAT,
+    lng: DataTypes.FLOAT,
+    stay: DataTypes.STRING,
+    date: DataTypes.DATE,
+  },
+  {
+    sequelize,
+    modelName: "destination",
+  }
+);
+
+Destination.belongsTo(Tribe, {
+  foreignKey: "tid",
 });
-Post.hasMany(Comment, {
-  foreignKey: "pid",
+Tribe.hasMany(Destination, {
+  foreignKey: "tid",
 });
 
 /**
@@ -438,7 +465,13 @@ server.post("/deleteFranchise", (req, res) =>
  */
 
 server.post("/createTribe", (req, res) =>
-  require("./createTribe").createTribe(req, res, User, Tribe, Channel)
+  require("./createTribe").createTribe(req, res, {
+    User,
+    Tribe,
+    Channel,
+    TribeSub,
+    ChannelSub,
+  })
 );
 
 server.get("/tribes", (req, res) =>
@@ -460,26 +493,40 @@ server.post("/joinTribe", (req, res) =>
 );
 
 /**
- * Posts
+ * Events
  */
-server.get("/posts", (req, res) =>
-  require("./posts").posts(req, res, User, Franchise, Post)
+server.get("/events", (req, res) =>
+  require("./events").events(req, res, User, Franchise, Event)
 );
 
-server.get("/getPost", (req, res) =>
-  require("./getPost").getPost(req, res, User, Franchise, Post, Comment)
+server.get("/getEvent", (req, res) =>
+  require("./getEvent").getEvent(req, res, User, Franchise, Event, EventSub)
 );
 
-server.post("/comment", (req, res) =>
-  require("./comment").comment(req, res, User, Franchise, Post, Comment)
+server.post("/createEvent", (req, res) =>
+  require("./createEvent").createEvent(req, res, {
+    User,
+    Franchise,
+    Event,
+    EventSub,
+    Channel,
+    ChannelSub,
+  })
 );
 
-server.post("/post", (req, res) =>
-  require("./post").post(req, res, User, Franchise, Post)
+/**
+ * Destinations
+ */
+server.get("/destinations", (req, res) =>
+  require("./destinations").destinations(req, res, User, Franchise, Destination)
 );
 
-server.post("/deletePost", (req, res) =>
-  require("./deletePost").deletePost(req, res, User, Franchise, Post, Comment)
+server.post("/createDestination", (req, res) =>
+  require("./createDestination").createDestination(req, res, {
+    User,
+    Franchise,
+    Destination,
+  })
 );
 
 /**

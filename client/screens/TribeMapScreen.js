@@ -2,6 +2,7 @@ import * as React from "react";
 import { Dimensions, StyleSheet, Text, View, SafeAreaView } from "react-native";
 
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import BottomSheet from "reanimated-bottom-sheet";
 
 import Separator from "../components/Separator";
 import ActivityIndicator from "../components/ActivityIndicator";

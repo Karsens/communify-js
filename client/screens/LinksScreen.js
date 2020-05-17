@@ -14,43 +14,31 @@ export default function LinksScreen({ navigation }) {
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
       >
-        {device.logged ? (
-          <>
-            <OptionButton
-              image={{ uri: Constants.SERVER_ADDR + me?.thumbnail }}
-              label="My account"
-              onPress={() => {
-                navigation.navigate("profile", { username: me?.username });
-              }}
-            />
+        <>
+          <OptionButton
+            image={{ uri: Constants.SERVER_ADDR + me?.thumbnail }}
+            label="My account"
+            onPress={() => {
+              navigation.navigate("profile", { username: me?.username });
+            }}
+          />
 
-            <OptionButton
-              icon="md-settings"
-              label="Settings"
-              onPress={() => {
-                navigation.navigate("settings");
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <OptionButton
-              icon="ios-contact"
-              label="Login"
-              onPress={() => {
-                navigation.navigate("login");
-              }}
-            />
+          <OptionButton
+            icon="md-settings"
+            label="Settings"
+            onPress={() => {
+              navigation.navigate("settings");
+            }}
+          />
 
-            <OptionButton
-              icon="ios-at"
-              label="Sign up"
-              onPress={() => {
-                navigation.navigate("signup");
-              }}
-            />
-          </>
-        )}
+          <OptionButton
+            icon="ios-airplane"
+            label="Explore Tribes"
+            onPress={() => {
+              navigation.navigate("tribes");
+            }}
+          />
+        </>
 
         {me?.level === 10 || __DEV__ ? (
           <OptionButton

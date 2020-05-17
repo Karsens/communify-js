@@ -4,7 +4,11 @@ const { saveImageIfValid } = require("./util");
 
 const { isEmail } = require("./util");
 
-const createTribe = async (req, res, User, Tribe, Channel) => {
+const createTribe = async (
+  req,
+  res,
+  { User, Tribe, Channel, TribeSub, ChannelSub }
+) => {
   const { tribe, image, tagline, bio, loginToken } = req.body;
 
   if (!loginToken) {
@@ -45,8 +49,9 @@ const createTribe = async (req, res, User, Tribe, Channel) => {
     image,
     true
   );
-
   if (invalid) return;
+
+  const code = Math.floor(Math.random() * 1000000).toString();
 
   const createTribe = await Tribe.create({
     fid: user.fid,
@@ -56,6 +61,8 @@ const createTribe = async (req, res, User, Tribe, Channel) => {
     bio,
     image: pathImage,
     thumbnail: pathThumbnail,
+    code,
+    open: false,
   });
 
   const createChannel = await Channel.create({
@@ -64,7 +71,18 @@ const createTribe = async (req, res, User, Tribe, Channel) => {
     name: tribe,
   });
 
-  if (!createTribe || !createChannel) {
+  const createTribeSub = await TribeSub.create({
+    tid: createTribe.id,
+    uid: user.id,
+    level: 1,
+  });
+
+  const createChannelSub = await ChannelSub.create({
+    uid: user.id,
+    cid: createChannel.id,
+  });
+
+  if (!createTribe || !createChannel || !createTribeSub || !createChannelSub) {
     res.json({ response: "Something went wrong" });
     return;
   }

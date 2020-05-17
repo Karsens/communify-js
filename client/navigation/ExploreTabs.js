@@ -9,12 +9,9 @@ import ChatsScreen from "../screens/ChatsScreen";
 import ChatScreen from "../screens/ChatScreen";
 import EventsScreen from "../screens/EventsScreen";
 import TribeScreen from "../screens/TribeScreen";
-import TribeDestinationsScreen from "../screens/TribeDestinationsScreen";
-import TribeMapScreen from "../screens/TribeMapScreen";
-import TribeMembersScreen from "../screens/TribeMembersScreen";
 
 const BottomTab = createBottomTabNavigator();
-const INITIAL_ROUTE_NAME = "home";
+const INITIAL_ROUTE_NAME = "tribes";
 
 const Stack = createStackNavigator();
 function ChatStack() {
@@ -39,34 +36,13 @@ export default function BottomTabNavigator({ navigation, route }) {
   return (
     <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
       <BottomTab.Screen
-        name="destinations"
-        component={TribeDestinationsScreen}
+        name="tribes"
+        component={TribesScreen}
         options={{
-          title: "Destinations",
+          headerTitle: () => null,
+          title: "Tribes",
           tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="ios-airplane" />
-          ),
-        }}
-      />
-
-      <BottomTab.Screen
-        name="map"
-        component={TribeMapScreen}
-        options={{
-          title: "Map",
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="ios-map" />
-          ),
-        }}
-      />
-
-      <BottomTab.Screen
-        name="chats"
-        component={ChatStack}
-        options={{
-          title: "Chat",
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="ios-chatbubbles" />
+            <TabBarIcon focused={focused} name="ios-people" />
           ),
         }}
       />
@@ -81,17 +57,6 @@ export default function BottomTabNavigator({ navigation, route }) {
           ),
         }}
       />
-
-      <BottomTab.Screen
-        name="links"
-        component={LinksScreen}
-        options={{
-          title: "More",
-          tabBarIcon: ({ focused }) => (
-            <TabBarIcon focused={focused} name="ios-more" />
-          ),
-        }}
-      />
     </BottomTab.Navigator>
   );
 }
@@ -101,15 +66,9 @@ function getHeaderTitle(route) {
     route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
 
   switch (routeName) {
-    case "posts":
-      return "Home";
-    case "chat":
-      return "Chat";
-    case "members":
-      return "Members";
-    case "links":
-      return "More";
-    case "resources":
-      return "Explore";
+    case "events":
+      return "Activities";
+    case "tribes":
+      return "Tribes";
   }
 }

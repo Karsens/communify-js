@@ -1,20 +1,12 @@
 import * as React from "react";
 import { StyleSheet, Text, View, SafeAreaView } from "react-native";
 
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-
-import TribeDestinationsScreen from "../screens/TribeDestinationsScreen";
-import TribeMapScreen from "../screens/TribeMapScreen";
-import TribeMembersScreen from "../screens/TribeMembersScreen";
-
 import Separator from "../components/Separator";
 import ActivityIndicator from "../components/ActivityIndicator";
 
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
 import Button from "../components/Button";
-
-const Tab = createMaterialTopTabNavigator();
 
 class TribeScreen extends React.Component {
   constructor(props) {
@@ -45,7 +37,7 @@ class TribeScreen extends React.Component {
     if (slug) {
       this.setState({ isFetching: true });
       fetch(
-        `${Constants.SERVER_ADDR}/tribe?fid=${global.franchise?.id}&slug=${slug}&token=${global.device.loginToken}`,
+        `${Constants.SERVER_ADDR}/tribe?fid=${global.franchise?.id}&slug=${slug}`,
         {
           method: "GET",
           headers: {
@@ -88,58 +80,10 @@ class TribeScreen extends React.Component {
       });
   };
 
-  renderNoTribe = () => {
-    const { navigation, global } = this.props;
-
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>You're not part of a tribe yet. </Text>
-        {global.device.logged ? (
-          <>
-            <Button
-              onPress={() => navigation.navigate("tribes")}
-              title="Click here to see all tribes"
-            />
-            <Button
-              onPress={() => navigation.navigate("createTribe")}
-              title="Click here to start a new tribe"
-            />
-          </>
-        ) : (
-          <>
-            <Button
-              onPress={() => navigation.navigate("signup")}
-              title="Click here to sign up"
-            />
-            <Button
-              onPress={() => navigation.navigate("login")}
-              title="Click here to login"
-            />
-          </>
-        )}
-      </View>
-    );
-  };
-
   renderFetching = () => {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />
-      </View>
-    );
-  };
-
-  renderMyTribe = () => {
-    const { tribe } = this.state;
-
-    return (
-      <View style={{ flex: 1 }}>
-        <Text>Tribe: {tribe.name}</Text>
-        <Tab.Navigator>
-          <Tab.Screen name="destinations" component={TribeDestinationsScreen} />
-          <Tab.Screen name="map" component={TribeMapScreen} />
-          <Tab.Screen name="members" component={TribeMembersScreen} />
-        </Tab.Navigator>
       </View>
     );
   };
@@ -170,13 +114,7 @@ class TribeScreen extends React.Component {
 
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-        {tribe
-          ? imInTribe
-            ? this.renderMyTribe()
-            : this.renderTribe()
-          : isFetching
-          ? this.renderFetching()
-          : this.renderNoTribe()}
+        {tribe ? this.renderTribe() : isFetching ? this.renderFetching() : null}
       </SafeAreaView>
     );
   }

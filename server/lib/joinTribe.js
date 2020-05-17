@@ -51,6 +51,11 @@ const joinTribe = async (
     return;
   }
 
+  if (!tribe.open) {
+    res.json({ response: "This tribe isn't public" });
+    return;
+  }
+
   const createTribeSub = await TribeSub.create({ tid: tribe.id, uid: user.id });
 
   const createChannelSub = await ChannelSub.create({

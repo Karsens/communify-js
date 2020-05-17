@@ -11,6 +11,7 @@ import {
   View,
   SafeAreaView,
 } from "react-native";
+
 import ExpoConstants from "expo-constants";
 import TouchableScale from "react-native-touchable-scale";
 
@@ -40,11 +41,11 @@ class TribesScreen extends React.Component {
     this.fetchTribes();
   }
 
-  // componentDidUpdate(prevProps) {
-  //   if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
-  //     this.onRefresh();
-  //   }
-  // }
+  componentDidUpdate(prevProps) {
+    if (prevProps.route.params?.reload !== this.props.route.params?.reload) {
+      this.onRefresh();
+    }
+  }
 
   fetchTribes = () => {
     const { global } = this.props;

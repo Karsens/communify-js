@@ -103,8 +103,12 @@ class LoginScreen extends React.Component {
                   }),
                 })
                   .then((response) => response.json())
-                  .then(async ({ response }) => {
+                  .then(async ({ response, slug }) => {
                     this.setState({ response, loading: false });
+                    if (slug) {
+                      global.reloadMe(global.device.loginToken);
+                      navigation.goBack();
+                    }
                   })
                   .catch((error) => {
                     console.log(error, url);

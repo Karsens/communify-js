@@ -15,14 +15,10 @@ import ImageInput from "../components/ImageInput";
 import Button from "../components/Button";
 import STYLE from "../Style";
 import Constants from "../Constants";
-import * as ImagePicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
 
 class SignupScreen extends React.Component {
   constructor(props) {
     super(props);
-
-    props.navigation.setOptions({ headerTitle: "Signup" });
 
     this.state = {
       email: "",

@@ -74,6 +74,7 @@ class LoginScreen extends React.Component {
                       type: "SET_LOGIN_TOKEN",
                       value: loginToken,
                     });
+                    global.reloadMe(loginToken);
                   }
                 })
                 .catch((error) => {
@@ -85,17 +86,6 @@ class LoginScreen extends React.Component {
             title="Forgot password?"
             onPress={() => navigation.navigate("forgotPassword")}
           />
-          <Button
-            title="Sign up"
-            onPress={() => navigation.navigate("signup")}
-          />
-
-          {__DEV__ ? (
-            <Button
-              title="Admin"
-              onPress={() => navigation.navigate("adminFranchise")}
-            />
-          ) : null}
         </ScrollView>
       </View>
     );

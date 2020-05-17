@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Communify",
-    "description": "Stimulate collaboration in coworking spaces",
-    "slug": "communify",
+    "name": "BackpackingTribe",
+    "description": "Align destinations & travel together with your tribe",
+    "slug": "backpackingtribe",
     "owner": "wwoessi",
     "platforms": ["ios", "android", "web"],
     "version": "1.0.0",

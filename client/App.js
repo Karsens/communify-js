@@ -17,14 +17,17 @@ import ErrorBoundary from "./ErrorBoundary";
 import { persistor, store } from "./Store";
 
 import BottomTabNavigator from "./navigation/BottomTabNavigator";
+import ExploreTabs from "./navigation/ExploreTabs";
 import Constants from "./Constants";
 
-import CreatePostScreen from "./screens/CreatePostScreen";
+import CreateEventScreen from "./screens/CreateEventScreen";
+import EventScreen from "./screens/EventScreen";
+
 import CreateTribeScreen from "./screens/CreateTribeScreen";
 import CreateFolderItemScreen from "./screens/CreateFolderItemScreen";
-import PostScreen from "./screens/PostScreen";
 import LoginScreen from "./screens/LoginScreen";
 import SignupScreen from "./screens/SignupScreen";
+import HomeScreen from "./screens/HomeScreen";
 import SignupFranchiseScreen from "./screens/SignupFranchiseScreen";
 import AdminFranchiseScreen from "./screens/AdminFranchiseScreen";
 import AdminScreen from "./screens/AdminScreen";
@@ -36,8 +39,10 @@ import ProfileScreen from "./screens/ProfileScreen";
 import ForgotPasswordScreen from "./screens/ForgotPasswordScreen";
 import NotFoundScreen from "./screens/NotFoundScreen";
 import TribeScreen from "./screens/TribeScreen";
-import ChatScreen from "./screens/ChatScreen";
-
+import JoinTribeScreen from "./screens/JoinTribeScreen";
+import WelcomeScreen from "./screens/WelcomeScreen";
+import TribesScreen from "./screens/TribesScreen";
+import Colors from "./constants/Colors";
 const Stack = createStackNavigator();
 
 if (Platform.OS === "android") {
@@ -85,6 +90,8 @@ function App({ global }) {
   } else {
     const initialRouteName = "app";
 
+    const hasTribe = global.me?.tribes?.length > 0;
+
     return (
       <View
         style={{
@@ -98,6 +105,7 @@ function App({ global }) {
             <meta name="description" content={global.franchise?.description} />
           </Helmet>
         ) : null}
+
         {Platform.OS === "ios" && <StatusBar barStyle="default" />}
         <NavigationContainer
           ref={containerRef}
@@ -113,54 +121,103 @@ function App({ global }) {
               component={NotFoundScreen}
             />
 
+            <Stack.Screen
+              name="adminFranchise"
+              component={AdminFranchiseScreen}
+            />
+            <Stack.Screen name="admin" component={AdminScreen} />
+
             {!global.device.logged ? (
               <>
-                <Stack.Screen name="login" component={LoginScreen} />
-                <Stack.Screen name="signup" component={SignupScreen} />
+                <Stack.Screen
+                  name="app"
+                  component={HomeScreen}
+                  options={{ title: "Home", header: () => null }}
+                />
+                <Stack.Screen
+                  name="login"
+                  component={LoginScreen}
+                  options={{ title: "Login" }}
+                />
+                <Stack.Screen
+                  name="signup"
+                  component={SignupScreen}
+                  options={{ title: "Sign up" }}
+                />
                 <Stack.Screen
                   name="forgotPassword"
                   component={ForgotPasswordScreen}
                 />
               </>
-            ) : null}
+            ) : (
+              <>
+                {hasTribe ? (
+                  <>
+                    <Stack.Screen
+                      name="app"
+                      component={BottomTabNavigator}
+                      options={{ title: "Home", header: () => null }}
+                    />
 
-            <>
-              <Stack.Screen
-                name="app"
-                component={BottomTabNavigator}
-                options={{ title: "Home", header: () => null }}
-              />
+                    <Stack.Screen
+                      name="createFolderItem"
+                      component={CreateFolderItemScreen}
+                    />
+                    <Stack.Screen
+                      name="createEvent"
+                      component={CreateEventScreen}
+                    />
+                    <Stack.Screen name="event" component={EventScreen} />
 
-              <Stack.Screen name="createTribe" component={CreateTribeScreen} />
+                    <Stack.Screen name="profile" component={ProfileScreen} />
+                    <Stack.Screen name="settings" component={SettingsScreen} />
+                    <Stack.Screen
+                      name="updateProfile"
+                      component={UpdateProfileScreen}
+                    />
+                    <Stack.Screen
+                      name="updateFranchise"
+                      component={UpdateFranchiseScreen}
+                    />
+                    <Stack.Screen
+                      name="changePassword"
+                      component={ChangePasswordScreen}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Stack.Screen
+                      name="app"
+                      component={WelcomeScreen}
+                      options={{ title: "Home", header: () => null }}
+                    />
+                    <Stack.Screen name="explore" component={ExploreTabs} />
+                  </>
+                )}
 
-              <Stack.Screen
-                name="createFolderItem"
-                component={CreateFolderItemScreen}
-              />
-              <Stack.Screen name="createPost" component={CreatePostScreen} />
-              <Stack.Screen name="post" component={PostScreen} />
+                <Stack.Screen
+                  name="tribes"
+                  component={TribesScreen}
+                  options={{
+                    headerTitle: () => null,
+                    title: "Tribes",
+                  }}
+                />
 
-              <Stack.Screen
-                name="adminFranchise"
-                component={AdminFranchiseScreen}
-              />
-              <Stack.Screen name="admin" component={AdminScreen} />
-              <Stack.Screen name="profile" component={ProfileScreen} />
-              <Stack.Screen name="tribe" component={TribeScreen} />
-              <Stack.Screen name="settings" component={SettingsScreen} />
-              <Stack.Screen
-                name="updateProfile"
-                component={UpdateProfileScreen}
-              />
-              <Stack.Screen
-                name="updateFranchise"
-                component={UpdateFranchiseScreen}
-              />
-              <Stack.Screen
-                name="changePassword"
-                component={ChangePasswordScreen}
-              />
-            </>
+                <Stack.Screen
+                  name="createTribe"
+                  component={CreateTribeScreen}
+                />
+
+                <Stack.Screen name="tribe" component={TribeScreen} />
+
+                <Stack.Screen
+                  name="joinTribe"
+                  component={JoinTribeScreen}
+                  options={{ title: "Join a tribe" }}
+                />
+              </>
+            )}
           </Stack.Navigator>
         </NavigationContainer>
       </View>
@@ -183,8 +240,6 @@ class _RootContainer extends React.Component {
         slug = hostname[0];
       }
     }
-
-    console.log("slug", slug);
 
     reloadFranchise(slug);
   }
