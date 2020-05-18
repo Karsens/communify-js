@@ -1,28 +1,22 @@
-import * as WebBrowser from "expo-web-browser";
+import { Ionicons } from "@expo/vector-icons";
 import * as React from "react";
 import {
+  Dimensions,
+  FlatList,
   Image,
-  Platform,
+  SafeAreaView,
   StyleSheet,
   Text,
-  FlatList,
-  KeyboardAvoidingView,
+  TextInput,
   TouchableOpacity,
   View,
-  Dimensions,
-  SafeAreaView,
-  TextInput,
 } from "react-native";
 import { RefreshControl } from "react-native-web-refresh-control";
-import { Ionicons } from "@expo/vector-icons";
-
-import STYLE from "../Style";
-import { withGlobalContext } from "../GlobalContext";
-import Constants from "../Constants";
-import Separator from "../components/Separator";
-import Button from "../components/Button";
 import ImageInput from "../components/ImageInput";
 import KeyboardAvoidingSpace from "../components/KeyboardAvoidingSpace";
+import Constants from "../Constants";
+import { withGlobalContext } from "../GlobalContext";
+import STYLE from "../Style";
 
 const { width } = Dimensions.get("window");
 const isBigDevice = width > 500;

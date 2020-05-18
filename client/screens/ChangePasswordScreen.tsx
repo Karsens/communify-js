@@ -1,12 +1,18 @@
 import * as React from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { withGlobalContext } from "../GlobalContext";
-
 import Button from "../components/Button";
-import STYLE from "../Style";
 import Constants from "../Constants";
-class ChangePasswordScreen extends React.Component {
+import { withGlobalContext } from "../GlobalContext";
+import STYLE from "../Style";
+import { Global, Navigation } from "../Types";
+
+interface Props {
+  navigation: Navigation;
+  global: Global;
+}
+
+class ChangePasswordScreen extends React.Component<Props> {
   constructor(props) {
     super(props);
 

@@ -1,10 +1,15 @@
 import * as React from "react";
 import { StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
-import { GlobalContext } from "../GlobalContext";
 import OptionButton from "../components/OptionButton";
-export default function LinksScreen({ navigation }) {
-  const { dispatch, me } = React.useContext(GlobalContext);
+import { GlobalContext } from "../GlobalContext";
+import { Global, Navigation } from "../Types";
+export default function LinksScreen({
+  navigation,
+}: {
+  navigation: Navigation;
+}) {
+  const { me }: Global = React.useContext(GlobalContext);
   return (
     <ScrollView
       style={styles.container}
