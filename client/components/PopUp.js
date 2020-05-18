@@ -3,13 +3,13 @@ import { FunctionComponent } from "react";
 import { Modal, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-interface IProps {
-  visible: boolean;
-  title?: string;
-  onClose?: any;
-  fullScreen?: boolean;
-  children: any;
-}
+type IProps = {
+  visible: boolean,
+  title?: string,
+  onClose?: any,
+  fullScreen?: boolean,
+  children: any,
+};
 
 const PopUp: FunctionComponent<IProps> = ({
   visible,

@@ -9,6 +9,7 @@ import ActivityIndicator from "../components/ActivityIndicator";
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
 import Button from "../components/Button";
+import SelectTribe from "../components/SelectTribe";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -61,14 +62,16 @@ class TribeScreen extends React.Component {
   };
 
   render() {
-    const { tribe, isFetching } = this.state;
+    const { isFetching } = this.state;
     const {
-      global: { me },
+      global: { me, tribe },
     } = this.props;
 
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+        <SelectTribe />
         <Text>DESTINATIONS</Text>
+        <Text>{JSON.stringify(tribe)}</Text>
       </SafeAreaView>
     );
   }

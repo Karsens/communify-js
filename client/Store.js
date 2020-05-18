@@ -43,8 +43,23 @@ const meReducer = (state = initMe, action) => {
   }
 };
 
+const initTribe = null;
+const tribeReducer = (state = initTribe, action) => {
+  switch (action.type) {
+    case "TRIBE_FETCH_SUCCEEDED": {
+      return action.tribe;
+    }
+
+    case "TRIBE_FETCH_FAILED": {
+      return state;
+    }
+    default:
+      return state;
+  }
+};
+
 const initFranchise = null;
-const franchiseReducer = (state = initMe, action) => {
+const franchiseReducer = (state = initFranchise, action) => {
   switch (action.type) {
     case "FRANCHISE_FETCH_SUCCEEDED": {
       return action.franchise;
@@ -61,13 +76,14 @@ const franchiseReducer = (state = initMe, action) => {
 const config = {
   key: "v1",
   storage: AsyncStorage,
-  whitelist: ["device", "me", "franchise"],
+  whitelist: ["device", "me", "franchise", "tribe"],
 };
 
 const sagaMiddleware = createSagaMiddleware();
 
 const reducers = {
   device: deviceReducer,
+  tribe: tribeReducer,
   me: meReducer,
   franchise: franchiseReducer,
 };

@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
-const tribes = (req, res, User, Tribe) => {
+const tribes = (req, res, User, Tribe, Destination) => {
   Tribe.findAll({
-    where: {},
+    include: { model: Destination },
   }).then((tr) => {
     res.json(tr);
   });

@@ -4,7 +4,7 @@ const { saveImageIfValid } = require("./util");
 const joinTribe = async (
   req,
   res,
-  { User, Tribe, TribeSub, Channel, ChannelSub }
+  { User, Tribe, TribeSub, Channel, ChannelSub, TribeSubRequest }
 ) => {
   const { id, loginToken } = req.body;
 
@@ -51,26 +51,36 @@ const joinTribe = async (
     return;
   }
 
-  if (!tribe.open) {
-    res.json({ response: "This tribe isn't public" });
-    return;
+  if (tribe.open) {
+    const createTribeSub = await TribeSub.create({
+      tid: tribe.id,
+      uid: user.id,
+    });
+
+    const createChannelSub = await ChannelSub.create({
+      uid: user.id,
+      cid: channel.id,
+    });
+
+    if (!createTribeSub || !createChannelSub) {
+      res.json({ response: "Couldn't create tribesub" });
+      return;
+    }
+
+    res.json({ response: `Tribe joined` });
+  } else {
+    const createTribeSubRequest = await TribeSubRequest.create({
+      tid: tribe.id,
+      uid: user.id,
+    });
+
+    if (!createTribeSubRequest) {
+      res.json({ response: "Couldn't create request" });
+      return;
+    }
+
+    res.json({ response: "Requested to join" });
   }
-
-  const createTribeSub = await TribeSub.create({ tid: tribe.id, uid: user.id });
-
-  const createChannelSub = await ChannelSub.create({
-    uid: user.id,
-    cid: channel.id,
-  });
-
-  if (!createTribeSub || !createChannelSub) {
-    res.json({ response: "Couldn't create tribesub" });
-    return;
-  }
-
-  res.json({
-    response: `Tribe joined`,
-  });
 };
 
 module.exports = { joinTribe };

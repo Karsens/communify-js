@@ -44,10 +44,10 @@ User.init(
     password: DataTypes.STRING,
     onlineAt: DataTypes.INTEGER,
     /**
-     * current community that is shown
+     * current tribe that is shown
      */
     fid: DataTypes.INTEGER,
-    coid: DataTypes.INTEGER,
+    tid: DataTypes.INTEGER,
   },
   { sequelize, modelName: "user" }
 );
@@ -108,6 +108,19 @@ TribeSub.init(
   {
     sequelize,
     modelName: "tribesub",
+  }
+);
+
+class TribeSubRequest extends Model {}
+
+TribeSubRequest.init(
+  {
+    uid: DataTypes.INTEGER,
+    tid: DataTypes.INTEGER,
+  },
+  {
+    sequelize,
+    modelName: "tribesubrequest",
   }
 );
 
@@ -275,51 +288,6 @@ Tribe.hasMany(Destination, {
   foreignKey: "tid",
 });
 
-/**
- * companies, teams
- */
-class Group extends Model {}
-
-Group.init(
-  {
-    coid: DataTypes.INTEGER,
-    name: DataTypes.STRING,
-    image: DataTypes.STRING,
-    thumbnail: DataTypes.STRING,
-  },
-  {
-    sequelize,
-    modelName: "group",
-  }
-);
-
-class GroupSub extends Model {}
-
-GroupSub.init(
-  {
-    uid: DataTypes.INTEGER,
-    gid: DataTypes.INTEGER,
-  },
-  {
-    sequelize,
-    modelName: "groupsub",
-  }
-);
-
-GroupSub.belongsTo(User, {
-  foreignKey: "uid",
-});
-User.hasMany(GroupSub, {
-  foreignKey: "uid",
-});
-
-GroupSub.belongsTo(Group, {
-  foreignKey: "gid",
-});
-Group.hasMany(GroupSub, {
-  foreignKey: "gid",
-});
-
 class Folder extends Model {}
 
 Folder.init(
@@ -407,6 +375,10 @@ server.get("/me", (req, res) =>
   require("./me").me(req, res, User, TribeSub, Tribe)
 );
 
+server.get("/meTribe", (req, res) =>
+  require("./meTribe").meTribe(req, res, { User, Tribe, Destination, TribeSub })
+);
+
 server.post("/forgotPassword", (req, res) =>
   require("./forgotPassword").forgotPassword(req, res, User)
 );
@@ -475,11 +447,11 @@ server.post("/createTribe", (req, res) =>
 );
 
 server.get("/tribes", (req, res) =>
-  require("./tribes").tribes(req, res, User, Tribe)
+  require("./tribes").tribes(req, res, User, Tribe, Destination)
 );
 
 server.get("/tribe", (req, res) =>
-  require("./tribe").tribe(req, res, User, Tribe)
+  require("./tribe").tribe(req, res, { User, Tribe, Destination, TribeSub })
 );
 
 server.post("/joinTribe", (req, res) =>
@@ -489,6 +461,7 @@ server.post("/joinTribe", (req, res) =>
     TribeSub,
     Channel,
     ChannelSub,
+    TribeSubRequest,
   })
 );
 
@@ -517,9 +490,6 @@ server.post("/createEvent", (req, res) =>
 /**
  * Destinations
  */
-server.get("/destinations", (req, res) =>
-  require("./destinations").destinations(req, res, User, Franchise, Destination)
-);
 
 server.post("/createDestination", (req, res) =>
   require("./createDestination").createDestination(req, res, {

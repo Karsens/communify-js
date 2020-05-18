@@ -10,6 +10,7 @@ import ActivityIndicator from "../components/ActivityIndicator";
 import { withGlobalContext } from "../GlobalContext";
 import Constants from "../Constants";
 import Button from "../components/Button";
+import SelectTribe from "../components/SelectTribe";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -77,7 +78,9 @@ class TribeScreen extends React.Component {
         {!MapView ? (
           <Text>Please download the app</Text>
         ) : (
-          <MapView style={styles.mapStyle} />
+          <MapView style={styles.mapStyle}>
+            <SelectTribe />
+          </MapView>
         )}
       </SafeAreaView>
     );
@@ -95,7 +98,7 @@ const styles = StyleSheet.create({
   },
   mapStyle: {
     width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
+    height: Dimensions.get("window").height - 100,
   },
 });
 

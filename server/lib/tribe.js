@@ -1,11 +1,9 @@
-const { Op } = require("sequelize");
-const tribe = async (req, res, User, Tribe) => {
+const tribe = async (req, res, { User, Tribe, Destination, TribeSub }) => {
   const { slug } = req.query;
   const tribe = await Tribe.findOne({
     where: { slug },
+    include: [{ model: Destination }],
   });
-
-  //also retreive desinations
 
   res.json(tribe);
 };

@@ -12,6 +12,16 @@ function* fetchMe(action) {
   }
 }
 
+function* fetchTribe(action) {
+  try {
+    const tribe = yield call(Api.fetchTribe, action.payload);
+
+    yield put({ type: "TRIBE_FETCH_SUCCEEDED", tribe });
+  } catch (e) {
+    yield put({ type: "TRIBE_FETCH_FAILED", message: e.message });
+  }
+}
+
 function* fetchFranchise(action) {
   try {
     const franchise = yield call(Api.fetchFranchise, action.payload);
@@ -23,6 +33,7 @@ function* fetchFranchise(action) {
 
 function* mySaga() {
   yield takeLatest("ME_FETCH_REQUESTED", fetchMe);
+  yield takeLatest("TRIBE_FETCH_REQUESTED", fetchTribe);
   yield takeLatest("FRANCHISE_FETCH_REQUESTED", fetchFranchise);
 }
 

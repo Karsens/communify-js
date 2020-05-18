@@ -265,12 +265,13 @@ class _RootContainer extends React.Component {
   }
 }
 
-const mapStateToProps = ({ device, me, franchise }) => {
-  //console.log("State gets mapped to props... device only");
-  return { device, me, franchise };
+const mapStateToProps = ({ device, me, franchise, tribe }) => {
+  return { device, me, franchise, tribe };
 }; //
 const mapDispatchToProps = (dispatch) => ({
   dispatch,
+  reloadTribe: (loginToken, slug) =>
+    dispatch({ type: "TRIBE_FETCH_REQUESTED", payload: { loginToken, slug } }),
   reloadMe: (loginToken) =>
     dispatch({ type: "ME_FETCH_REQUESTED", payload: { loginToken } }),
   reloadFranchise: (slug) =>

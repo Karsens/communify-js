@@ -19,6 +19,25 @@ const fetchMe = (payload) => {
     });
 };
 
+const fetchTribe = (payload) => {
+  const url = `${Constants.SERVER_ADDR}/meTribe?loginToken=${payload.loginToken}&slug=${payload.slug}`;
+
+  return fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then(async (tribe) => {
+      return tribe;
+    })
+    .catch((error) => {
+      console.log(error, url);
+    });
+};
+
 const fetchFranchise = (payload) => {
   const url = `${Constants.SERVER_ADDR}/franchise?slug=${payload.slug}`;
 
@@ -38,5 +57,5 @@ const fetchFranchise = (payload) => {
     });
 };
 
-const Api = { fetchMe, fetchFranchise };
+const Api = { fetchMe, fetchFranchise, fetchTribe };
 export default Api;

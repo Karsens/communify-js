@@ -17,6 +17,7 @@ import Constants from "../Constants";
 import Separator from "../components/Separator";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "../components/Button";
+import SelectTribe from "../components/SelectTribe";
 
 class ChatScreen extends React.Component {
   constructor(props) {
@@ -26,6 +27,12 @@ class ChatScreen extends React.Component {
       channelsubs: [],
       isFetching: true,
     };
+
+    props.navigation.setOptions({
+      title: "",
+      headerLeft: () => <Text style={{ fontSize: 24 }}>Chats</Text>,
+      headerRight: SelectTribe,
+    });
   }
 
   componentDidMount() {
@@ -123,34 +130,18 @@ class ChatScreen extends React.Component {
     const { channelsubs } = this.state;
     return (
       <SafeAreaView style={styles.container}>
-        {global.device.logged ? (
-          <FlatList
-            data={channelsubs}
-            renderItem={this.renderItem}
-            ItemSeparatorComponent={() => <Separator />}
-            keyExtractor={(item, index) => index.toString()}
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.isFetching}
-                onRefresh={this.onRefresh}
-              />
-            }
-          />
-        ) : (
-          <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-          >
-            <Text>You're not logged in</Text>
-            <Button
-              onPress={() => navigation.navigate("signup")}
-              title="Click here to sign up"
+        <FlatList
+          data={channelsubs}
+          renderItem={this.renderItem}
+          ItemSeparatorComponent={() => <Separator />}
+          keyExtractor={(item, index) => index.toString()}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.isFetching}
+              onRefresh={this.onRefresh}
             />
-            <Button
-              onPress={() => navigation.navigate("login")}
-              title="Click here to login"
-            />
-          </View>
-        )}
+          }
+        />
       </SafeAreaView>
     );
   }
