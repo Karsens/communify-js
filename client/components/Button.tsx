@@ -1,10 +1,16 @@
+import * as Icon from "@expo/vector-icons";
 import React from "react";
-import { TouchableOpacity, Text, View, Dimensions } from "react-native";
-import * as Icon from "react-native-vector-icons";
-const { width } = Dimensions.get("window");
-const isSmall = width < 800;
+import { Text, TouchableOpacity, View } from "react-native";
 
-class Button extends React.Component {
+interface Props {
+  icon?: string;
+  font?: string;
+  title: string;
+  onPress: () => void;
+  disabled?: boolean;
+  style?: object;
+}
+class Button extends React.Component<Props> {
   render() {
     const { icon, font, title, onPress, disabled, style } = this.props;
 

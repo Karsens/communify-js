@@ -1,28 +1,39 @@
+import { Ionicons } from "@expo/vector-icons";
 import * as React from "react";
 import {
-  Platform,
-  StyleSheet,
-  Text,
-  Button,
-  TouchableOpacity,
   FlatList,
-  View,
+  Text,
   TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import STYLE from "../Style";
-import { Ionicons } from "@expo/vector-icons";
-
-import { withGlobalContext } from "../GlobalContext";
+import Button from "../components/Button";
 import Constants from "../Constants";
+import { withGlobalContext } from "../GlobalContext";
+import STYLE from "../Style";
+import { Franchise, Global, Navigation } from "../Types";
 
-class AdminFranchiseScreen extends React.Component {
-  constructor(props) {
+interface Props {
+  navigation: Navigation;
+  global: Global;
+}
+interface State {
+  password: string;
+  response: string | null;
+  name: string;
+  franchises: Franchise[];
+}
+class AdminFranchiseScreen extends React.Component<{}, State> {
+  constructor(props: Props) {
     super(props);
 
     props.navigation.setOptions({ headerTitle: "Franchises" });
 
     this.state = {
       franchises: [],
+      password: "",
+      response: null,
+      name: "",
     };
   }
 
@@ -47,7 +58,7 @@ class AdminFranchiseScreen extends React.Component {
       });
   };
 
-  deleteFranchise = (id) => {
+  deleteFranchise = (id: number) => {
     const { password } = this.state;
     fetch(`${Constants.SERVER_ADDR}/deleteFranchise`, {
       method: "POST",
@@ -87,7 +98,7 @@ class AdminFranchiseScreen extends React.Component {
       });
   };
 
-  renderItem = ({ item }) => {
+  renderItem = ({ item }: { item: Franchise }) => {
     return (
       <View style={{ flexDirection: "row" }}>
         <Text>{item.id}</Text>
@@ -126,7 +137,13 @@ class AdminFranchiseScreen extends React.Component {
     const { franchises } = this.state;
 
     return (
-      <View style={styles.container}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "#fff",
+          padding: 10,
+        }}
+      >
         {this.renderCreateSection()}
         <FlatList
           data={franchises}
@@ -137,13 +154,5 @@ class AdminFranchiseScreen extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 10,
-  },
-});
 
 export default withGlobalContext(AdminFranchiseScreen);

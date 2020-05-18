@@ -1,9 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as React from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { RectButton } from "react-native-gesture-handler";
 
-function OptionButton({ icon, image, label, onPress, isLastOption }) {
+function OptionButton({
+  icon,
+  image,
+  label,
+  onPress,
+  isLastOption,
+}: {
+  icon: string;
+  image: { uri: string };
+  label: string;
+  onPress: () => void;
+  isLastOption: boolean;
+}) {
   return (
     <RectButton
       style={[styles.option, isLastOption && styles.lastOption]}
@@ -20,7 +32,7 @@ function OptionButton({ icon, image, label, onPress, isLastOption }) {
             <Ionicons name={icon} size={22} color="rgba(0,0,0,0.35)" />
           )}
         </View>
-        <View style={styles.optionTextContainer}>
+        <View>
           <Text style={styles.optionText}>{label}</Text>
         </View>
       </View>
